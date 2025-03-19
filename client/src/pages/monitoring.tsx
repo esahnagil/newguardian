@@ -257,6 +257,8 @@ const Monitoring = () => {
     queryKey: ['/api/devices'],
   });
   
+
+  
   // Cihaz ekleme için ayrı bir form instance'ı
   const deviceForm = useForm<z.infer<typeof deviceSchema>>({
     resolver: zodResolver(deviceSchema),
@@ -854,7 +856,7 @@ const Monitoring = () => {
     toggleMonitorMutation.mutate({ id, enabled: !currentStatus });
   };
 
-  // Add Device related schema and mutation (needs to be defined elsewhere and imported)
+  // Add Device related schema and mutation
   const deviceTypes = [
     { value: 'server', label: 'Sunucu' },
     { value: 'router', label: 'Yönlendirici' },
@@ -868,14 +870,19 @@ const Monitoring = () => {
     { value: 'cloudservice', label: 'Bulut Servisi' },
     { value: 'other', label: 'Diğer' }
   ];
+
+  // Cihaz schema tanımı
   const deviceSchema = z.object({
-    name: z.string().min(1),
-    ipAddress: z.string().ip(),
-    type: z.string()
+    name: z.string().min(1, "Cihaz adı girilmelidir"),
+    ipAddress: z.string().ip("Geçerli bir IP adresi girin"),
+    type: z.string().min(1, "Cihaz türü seçilmelidir")
   });
 
+  // Cihaz tipi için form değişkeni
+  type DeviceFormValues = z.infer<typeof deviceSchema>;
+  
   const createDeviceMutation = useMutation({
-    mutationFn: async (data: z.infer<typeof deviceSchema>) => {
+    mutationFn: async (data: DeviceFormValues) => {
       return await apiRequest('POST', '/api/devices', data);
     },
     onSuccess: () => {
@@ -892,7 +899,7 @@ const Monitoring = () => {
     }
   });
 
-  const handleDeviceSubmit = (values: z.infer<typeof deviceSchema>) => {
+  const handleDeviceSubmit = (values: DeviceFormValues) => {
     createDeviceMutation.mutate(values);
   };
 
@@ -1069,15 +1076,18 @@ const Monitoring = () => {
               <DialogHeader>
                 <DialogTitle>Yeni İzleyici Ekle</DialogTitle>
               </DialogHeader>
-              <Form {...form} onSubmit={form.handleSubmit(onSubmit)}>
-                <div className="space-y-4">
+              <Form {...form}>
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
                   <FormField
                     control={form.control}
                     name="deviceId"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Cihaz</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <Select 
+                          onValueChange={(val) => field.onChange(Number(val))} 
+                          defaultValue={field.value?.toString()}
+                        >
                           <FormControl>
                             <SelectTrigger>
                               <SelectValue placeholder="Cihaz seçin" />
@@ -1085,7 +1095,7 @@ const Monitoring = () => {
                           </FormControl>
                           <SelectContent>
                             {devices?.map((device) => (
-                              <SelectItem key={device.id} value={device.id}>
+                              <SelectItem key={device.id} value={device.id.toString()}>
                                 {device.name}
                               </SelectItem>
                             ))}
@@ -1126,7 +1136,10 @@ const Monitoring = () => {
                       <FormItem className="flex items-center">
                         <FormLabel>Etkin</FormLabel>
                         <FormControl>
-                          <Switch {...field} />
+                          <Switch 
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                          />
                         </FormControl>
                       </FormItem>
                     )}
@@ -1150,7 +1163,7 @@ const Monitoring = () => {
                       {createMonitorMutation.isPending ? 'Oluşturuluyor...' : 'Oluştur'}
                     </Button>
                   </DialogFooter>
-                </div>
+                </form>
               </Form>
             </DialogContent>
           </Dialog>
