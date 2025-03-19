@@ -256,6 +256,16 @@ const Monitoring = () => {
   const { data: devices } = useQuery<Device[]>({
     queryKey: ['/api/devices'],
   });
+  
+  // Cihaz ekleme için ayrı bir form instance'ı
+  const deviceForm = useForm<z.infer<typeof deviceSchema>>({
+    resolver: zodResolver(deviceSchema),
+    defaultValues: {
+      name: '',
+      ipAddress: '',
+      type: 'server'
+    }
+  });
 
   // Fetch monitors
   const { data: monitors, isLoading: isLoadingMonitors } = useQuery<Monitor[]>({
@@ -846,7 +856,17 @@ const Monitoring = () => {
 
   // Add Device related schema and mutation (needs to be defined elsewhere and imported)
   const deviceTypes = [
-    // ... your device types here ...
+    { value: 'server', label: 'Sunucu' },
+    { value: 'router', label: 'Yönlendirici' },
+    { value: 'switch', label: 'Anahtar' },
+    { value: 'firewall', label: 'Güvenlik Duvarı' },
+    { value: 'workstation', label: 'İş İstasyonu' },
+    { value: 'printer', label: 'Yazıcı' },
+    { value: 'camera', label: 'Kamera' },
+    { value: 'webserver', label: 'Web Sunucusu' },
+    { value: 'database', label: 'Veritabanı' },
+    { value: 'cloudservice', label: 'Bulut Servisi' },
+    { value: 'other', label: 'Diğer' }
   ];
   const deviceSchema = z.object({
     name: z.string().min(1),
@@ -962,10 +982,10 @@ const Monitoring = () => {
               <DialogHeader>
                 <DialogTitle>Yeni Cihaz Ekle</DialogTitle>
               </DialogHeader>
-              <Form {...form}>
-                <form onSubmit={form.handleSubmit(handleDeviceSubmit)} className="space-y-4">
+              <Form {...deviceForm}>
+                <form onSubmit={deviceForm.handleSubmit(handleDeviceSubmit)} className="space-y-4">
                   <FormField
-                    control={form.control}
+                    control={deviceForm.control}
                     name="name"
                     render={({ field }) => (
                       <FormItem>
@@ -977,7 +997,7 @@ const Monitoring = () => {
                       </FormItem>
                     )}                  />
                   <FormField
-                    control={form.control}
+                    control={deviceForm.control}
                     name="ipAddress"
                     render={({ field }) => (
                       <FormItem>
@@ -990,7 +1010,7 @@ const Monitoring = () => {
                     )}
                   />
                   <FormField
-                    control={form.control}
+                    control={deviceForm.control}
                     name="type"
                     render={({ field }) => (
                       <FormItem>
@@ -1211,12 +1231,11 @@ const Monitoring = () => {
                           <SelectValue placeholder="Cihaz türü seçin" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="router">Yönlendirici</SelectItem>
-                          <SelectItem value="switch">Anahtar</SelectItem>
-                          <SelectItem value="server">Sunucu</SelectItem>
-                          <SelectItem value="firewall">Güvenlik Duvarı</SelectItem>
-                          <SelectItem value="workstation">İş İstasyonu</SelectItem>
-                          <SelectItem value="other">Diğer</SelectItem>
+                          {deviceTypes.map((type) => (
+                            <SelectItem key={type.value} value={type.value}>
+                              {type.label}
+                            </SelectItem>
+                          ))}
                         </SelectContent>
                       </Select>
                     </div>
