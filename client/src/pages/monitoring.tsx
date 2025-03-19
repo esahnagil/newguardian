@@ -258,9 +258,18 @@ const Monitoring = () => {
   });
   
 
+  // Cihaz schema tanımı
+  const deviceSchema = z.object({
+    name: z.string().min(1, "Cihaz adı girilmelidir"),
+    ipAddress: z.string().ip("Geçerli bir IP adresi girin"),
+    type: z.string().min(1, "Cihaz türü seçilmelidir")
+  });
   
+  // Cihaz tipi için form değişkeni
+  type DeviceFormValues = z.infer<typeof deviceSchema>;
+
   // Cihaz ekleme için ayrı bir form instance'ı
-  const deviceForm = useForm<z.infer<typeof deviceSchema>>({
+  const deviceForm = useForm<DeviceFormValues>({
     resolver: zodResolver(deviceSchema),
     defaultValues: {
       name: '',
@@ -871,15 +880,7 @@ const Monitoring = () => {
     { value: 'other', label: 'Diğer' }
   ];
 
-  // Cihaz schema tanımı
-  const deviceSchema = z.object({
-    name: z.string().min(1, "Cihaz adı girilmelidir"),
-    ipAddress: z.string().ip("Geçerli bir IP adresi girin"),
-    type: z.string().min(1, "Cihaz türü seçilmelidir")
-  });
-
-  // Cihaz tipi için form değişkeni
-  type DeviceFormValues = z.infer<typeof deviceSchema>;
+  // DeviceFormValues tipi zaten yukarıda tanımlandı
   
   const createDeviceMutation = useMutation({
     mutationFn: async (data: DeviceFormValues) => {
@@ -1813,8 +1814,6 @@ const getMonitorTypeLabel = (type: string): string => {
   return labels[type] || type;
 };
 
-const onUpdateMonitor = (values: MonitorFormValues) => {
-  updateMonitorMutation.mutate(values);
-};
+// onUpdateMonitor fonksiyonu yukarıda zaten tanımlandı
 
 export default Monitoring;
