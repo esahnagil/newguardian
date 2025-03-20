@@ -4,6 +4,7 @@ import * as schema from "../shared/schema";
 import { devices, monitors, monitorResults, alerts } from "../shared/schema";
 import type { InsertDevice, InsertMonitor, InsertAlert } from "../shared/schema";
 import { storage, MemStorage } from "./storage";
+import { PostgresJsDatabase } from "drizzle-orm/postgres-js";
 
 /**
  * Check if required tables exist in the database
