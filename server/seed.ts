@@ -1,7 +1,7 @@
 import { db } from "./db";
 import { sql } from "drizzle-orm";
-import { devices, monitors, monitorResults, alerts } from "@shared/schema";
-import type { InsertDevice, InsertMonitor, InsertAlert } from "@shared/schema";
+import * as schema from "../shared/schema";
+import type { InsertDevice, InsertMonitor, InsertAlert } from "../shared/schema";
 import { storage, MemStorage } from "./storage";
 
 /**
@@ -10,12 +10,15 @@ import { storage, MemStorage } from "./storage";
 async function checkTablesExist() {
   try {
     const tablesExist = await db.execute(sql`
-      SELECT EXISTS (
-        SELECT FROM information_schema.tables 
-        WHERE table_name IN ('devices', 'monitors', 'monitor_results', 'alerts')
-      );
+      SELECT COUNT(*) FROM information_schema.tables 
+      WHERE table_name IN ('devices', 'monitors', 'monitor_results', 'alerts');
     `);
-    return tablesExist.rows[0].exists;
+    
+    // rows dizisini ve count değerini kontrol et
+    if (tablesExist && tablesExist.rows && tablesExist.rows.length > 0) {
+      return parseInt(tablesExist.rows[0].count) >= 4;
+    }
+    return false;
   } catch (error) {
     console.error("Error checking tables:", error);
     return false;
@@ -41,7 +44,7 @@ export async function seedDatabase() {
     }
 
     // Check if database is already seeded
-    const existingDevices = await db.select().from(devices);
+    const existingDevices = await db.select().from(schema.devices);
     if (existingDevices.length > 0) {
       console.log("Database already seeded, skipping seed operation");
       return;
@@ -53,9 +56,16 @@ export async function seedDatabase() {
     const sampleDevices: InsertDevice[] = [
       { name: "Core Router", ipAddress: "192.168.1.1", type: "router" },
       { name: "Main Switch", ipAddress: "192.168.1.2", type: "switch" },
+      { name: "Distribution Switch", ipAddress: "192.168.1.3", type: "switch" },
       { name: "Web Server", ipAddress: "192.168.1.100", type: "server" },
       { name: "Database Server", ipAddress: "192.168.1.101", type: "server" },
-      { name: "AP Office 1", ipAddress: "192.168.1.150", type: "access_point" }
+      { name: "Mail Server", ipAddress: "192.168.1.102", type: "server" },
+      { name: "Backup Server", ipAddress: "192.168.1.103", type: "server" },
+      { name: "AP Office 1", ipAddress: "192.168.1.150", type: "access_point" },
+      { name: "AP Office 2", ipAddress: "192.168.1.151", type: "access_point" },
+      { name: "AP Meeting Room", ipAddress: "192.168.1.152", type: "access_point" },
+      { name: "Firewall", ipAddress: "192.168.1.254", type: "firewall" },
+      { name: "NAS Storage", ipAddress: "192.168.1.200", type: "storage" }
     ];
 
     // Insert devices and get their IDs
@@ -114,10 +124,11 @@ export async function seedDatabase() {
       }
     }
 
-    // Add HTTP monitor for web server
+    // Add HTTP monitors for web and mail servers
     try {
-      const httpMonitor: InsertMonitor = {
-        deviceId: 3, // Web Server
+      // Web Server HTTP monitor
+      const httpWebMonitor: InsertMonitor = {
+        deviceId: 4, // Web Server
         type: "http",
         config: { 
           url: "http://192.168.1.100", 
@@ -130,28 +141,70 @@ export async function seedDatabase() {
         interval: 60
       };
 
-      const [httpResult] = await db
+      const [httpWebResult] = await db
         .insert(monitors)
         .values({
-          ...httpMonitor,
+          ...httpWebMonitor,
+          createdAt: new Date(),
+          updatedAt: new Date()
+        })
+        .returning();
+        
+      // Mail Server HTTP monitor
+      const httpMailMonitor: InsertMonitor = {
+        deviceId: 6, // Mail Server
+        type: "http",
+        config: { 
+          url: "http://192.168.1.102/webmail", 
+          method: "GET", 
+          expectedStatus: 200, 
+          timeout: 5,
+          validateSSL: false
+        },
+        enabled: true,
+        interval: 60
+      };
+
+      const [httpMailResult] = await db
+        .insert(monitors)
+        .values({
+          ...httpMailMonitor,
           createdAt: new Date(),
           updatedAt: new Date()
         })
         .returning();
 
-      // Add TCP monitor for database server
-      const tcpMonitor: InsertMonitor = {
-        deviceId: 4, // Database Server
+      // Add TCP monitors for database and mail servers
+      const tcpDBMonitor: InsertMonitor = {
+        deviceId: 5, // Database Server
         type: "tcp",
         config: { port: 5432, timeout: 5 },
         enabled: true,
         interval: 60
       };
 
-      const [tcpResult] = await db
+      const [tcpDBResult] = await db
         .insert(monitors)
         .values({
-          ...tcpMonitor,
+          ...tcpDBMonitor,
+          createdAt: new Date(),
+          updatedAt: new Date()
+        })
+        .returning();
+        
+      // Mail Server SMTP TCP monitor
+      const tcpMailMonitor: InsertMonitor = {
+        deviceId: 6, // Mail Server
+        type: "tcp",
+        config: { port: 25, timeout: 5 },
+        enabled: true,
+        interval: 60
+      };
+
+      const [tcpMailResult] = await db
+        .insert(monitors)
+        .values({
+          ...tcpMailMonitor,
           createdAt: new Date(),
           updatedAt: new Date()
         })
@@ -160,22 +213,36 @@ export async function seedDatabase() {
       // Add some alerts
       const alertData: InsertAlert[] = [
         {
-          deviceId: 3,
-          monitorId: httpResult.id,
+          deviceId: 4,
+          monitorId: httpWebResult.id,
           message: "Web Server Offline",
           severity: "danger",
           status: "active"
         },
         {
-          deviceId: 4,
-          monitorId: tcpResult.id,
+          deviceId: 5,
+          monitorId: tcpDBResult.id,
           message: "High CPU Usage",
           severity: "warning",
           status: "active"
         },
         {
-          deviceId: 5,
-          monitorId: 5, // ICMP monitor for AP
+          deviceId: 6,
+          monitorId: httpMailResult.id,
+          message: "Mail Server HTTP Error",
+          severity: "danger",
+          status: "active"
+        },
+        {
+          deviceId: 6,
+          monitorId: tcpMailResult.id,
+          message: "Mail Server SMTP Error",
+          severity: "warning",
+          status: "active"
+        },
+        {
+          deviceId: 8,
+          monitorId: 8, // ICMP monitor for AP
           message: "AP Response Time",
           severity: "warning",
           status: "active"
