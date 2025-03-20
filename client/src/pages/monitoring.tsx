@@ -1611,8 +1611,8 @@ const Monitoring = () => /* data-replit-metadata is auto-added here, but causes 
                                     setSelectedMonitorType(monitor.type as any);
                                   }}
                                 >
-                                  {/* Aç/Kapat switch'i sağ üst köşede */}
-                                  <div className="absolute top-2 right-2" onClick={(e) => e.stopPropagation()}>
+                                  {/* Aç/Kapat switch'i sağ tarafta ortalı */}
+                                  <div className="absolute top-0 right-3 bottom-0 flex items-center" onClick={(e) => e.stopPropagation()}>
                                     <Switch
                                       checked={monitor.enabled}
                                       onCheckedChange={() => handleToggleMonitor(monitor.id, monitor.enabled)}
