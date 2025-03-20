@@ -61,28 +61,15 @@ export const alerts = pgTable("alerts", {
   resolved_at: timestamp("resolved_at"),
 });
 
-export const insertUserSchema = createInsertSchema(users).pick({
-  username: true,
-  password: true,
-  fullName: true,
-  email: true,
-  role: true,
-  isActive: true,
-  createdBy: true,
-});
+export const insertUserSchema = createInsertSchema(users);
 
-export const updateUserSchema = createInsertSchema(users).pick({
-  fullName: true,
-  email: true,
-  role: true,
-  isActive: true,
-}).partial();
+export const updateUserSchema = createInsertSchema(users).partial();
 
 export const userPreferencesSchema = z.object({
   theme: z.enum(['light', 'dark', 'system']).default('system'),
   language: z.enum(['tr', 'en']).default('tr'),
-  emailNotifications: z.boolean().default(true),
-  dashboardLayout: z.record(z.string(), z.any()).optional(),
+  email_notifications: z.boolean().default(true),
+  dashboard_layout: z.record(z.string(), z.any()).optional(),
 });
 
 export const insertDeviceSchema = createInsertSchema(devices).pick({
@@ -92,7 +79,7 @@ export const insertDeviceSchema = createInsertSchema(devices).pick({
 });
 
 export const insertMonitorSchema = createInsertSchema(monitors).pick({
-  deviceId: true,
+  device_id: true,
   type: true,
   config: true,
   enabled: true,
@@ -100,8 +87,8 @@ export const insertMonitorSchema = createInsertSchema(monitors).pick({
 });
 
 export const insertAlertSchema = createInsertSchema(alerts).pick({
-  deviceId: true,
-  monitorId: true,
+  device_id: true,
+  monitor_id: true,
   message: true,
   severity: true,
   status: true,
@@ -110,7 +97,7 @@ export const insertAlertSchema = createInsertSchema(alerts).pick({
 // Protocol-specific configurations
 export const icmpConfigSchema = z.object({
   timeout: z.number().min(1).default(5), // seconds
-  packetSize: z.number().min(1).default(56), // bytes
+  packet_size: z.number().min(1).default(56), // bytes
   count: z.number().min(1).default(3), // number of packets to send
 });
 
@@ -126,9 +113,9 @@ export const httpConfigSchema = z.object({
   method: z.enum(["GET", "POST", "PUT", "DELETE"]).default("GET"),
   headers: z.record(z.string()).optional(),
   body: z.string().optional(),
-  expectedStatus: z.number().min(100).max(599).default(200),
+  expected_status: z.number().min(100).max(599).default(200),
   timeout: z.number().min(1).default(5), // seconds
-  validateSSL: z.boolean().default(true),
+  validate_ssl: z.boolean().default(true),
 });
 
 export const tcpConfigSchema = z.object({
