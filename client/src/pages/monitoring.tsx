@@ -1593,10 +1593,10 @@ const Monitoring = () => /* data-replit-metadata is auto-added here, but causes 
 
                       {/* Genişletilmiş cihaz izleyicileri - Kart şeklinde */}
                       {isExpanded && (
-                        <TableRow key={`${device.id}-monitors`} className="bg-gray-50">
+                        <TableRow key={`${device.id}-monitors`} className="bg-gray-50 animate-fadeIn">
                           <TableCell></TableCell>
                           <TableCell colSpan={4} className="p-4">
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 animate-slideDown">
                               {deviceMonitors.map(monitor => (
                                 <div
                                   key={`${device.id}-${monitor.id}`}
@@ -1638,7 +1638,7 @@ const Monitoring = () => /* data-replit-metadata is auto-added here, but causes 
 
                       {/* Eğer cihazın izleyicisi yoksa ve genişletilmişse bilgi mesajı göster */}
                       {isExpanded && deviceMonitors.length === 0 && (
-                        <TableRow className="bg-gray-50">
+                        <TableRow className="bg-gray-50 animate-fadeIn">
                           <TableCell colSpan={5} className="text-center py-4">
                             <p className="text-gray-500">Bu cihaz için henüz izleyici bulunmuyor.</p>
                           </TableCell>
