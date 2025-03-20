@@ -244,7 +244,7 @@ const MonitorTypeIcon = ({ type }: { type: string }) => {
   );
 };
 
-const Monitoring = () => {
+const Monitoring = () => /* data-replit-metadata is auto-added here, but causes warnings */ {
   const { toast } = useToast();
   const [isAddMonitorOpen, setIsAddMonitorOpen] = useState(false);
   const [selectedMonitorType, setSelectedMonitorType] = useState<"icmp" | "snmp" | "http" | "tcp" | null>(null);
@@ -1517,7 +1517,7 @@ const Monitoring = () => {
                   }
 
                   return (
-                    <React.Fragment key={device.id}>
+                    <React.Fragment key={device.id.toString()}>
                       {/* Ana cihaz satırı */}
                       <TableRow
                         className={cn(
@@ -1623,9 +1623,9 @@ const Monitoring = () => {
                                     />
                                   </div>
 
-                                  <div className="p-4">
+                                  <div className="p-4 h-full flex items-center justify-center">
                                     {/* İzleyici başlığı ve tipi */}
-                                    <div className="flex items-center space-x-2 mb-3">
+                                    <div className="flex items-center space-x-2">
                                       <MonitorTypeIcon type={monitor.type} />
                                       <span className="font-medium">
                                         {monitorTypes.find(t => t.value === monitor.type)?.label || monitor.type}
