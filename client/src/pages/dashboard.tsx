@@ -7,8 +7,8 @@ const Dashboard = () => {
   return (
     <main className="flex-1 overflow-y-auto bg-gray-100 p-4">
       <div className="mb-6">
-        <h2 className="text-2xl font-semibold">Ağ Genel Bakışı</h2>
-        <p className="text-gray-600">Ağ altyapınızı izleyin</p>
+        <h2 className="text-2xl font-semibold text-primary">Gösterge Paneli</h2>
+        <p className="text-gray-600">Sistemlerinizi izleyin ve yönetin</p>
       </div>
 
       {/* Status Overview */}
