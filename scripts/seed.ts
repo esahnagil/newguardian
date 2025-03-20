@@ -59,13 +59,16 @@ async function seedDatabase() {
     const deviceIds: number[] = [];
     
     for (const device of sampleDevices) {
-      const result = await db.insert(devices).values({
+      console.log("Trying to insert device:", device);
+      const insertObj = {
         name: device.name,
         ip_address: device.ip_address,
         type: device.type,
         created_at: new Date(),
         updated_at: new Date()
-      }).returning();
+      };
+      console.log("Insert object:", insertObj);
+      const result = await db.insert(devices).values(insertObj).returning();
       
       deviceIds.push(result[0].id);
     }

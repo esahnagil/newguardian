@@ -23,42 +23,42 @@ export const users = pgTable("users", {
 export const devices = pgTable("devices", {
   id: serial("id").primaryKey(),
   name: text("name").notNull(),
-  ipAddress: text("ip_address").notNull(),
+  ip_address: text("ip_address").notNull(),
   type: text("type").notNull(), // router, switch, server, etc.
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow(),
+  created_at: timestamp("created_at").defaultNow(),
+  updated_at: timestamp("updated_at").defaultNow(),
 });
 
 export const monitors = pgTable("monitors", {
   id: serial("id").primaryKey(),
-  deviceId: integer("device_id").notNull(),
+  device_id: integer("device_id").notNull(),
   type: text("type").notNull(), // icmp, snmp, http, tcp
   config: json("config").notNull(), // configuration for the specific monitor
   enabled: boolean("enabled").notNull().default(true),
   interval: integer("interval").notNull().default(60), // seconds
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow(),
+  created_at: timestamp("created_at").defaultNow(),
+  updated_at: timestamp("updated_at").defaultNow(),
 });
 
 export const monitorResults = pgTable("monitor_results", {
   id: serial("id").primaryKey(),
-  monitorId: integer("monitor_id").notNull(),
+  monitor_id: integer("monitor_id").notNull(),
   timestamp: timestamp("timestamp").defaultNow(),
   status: text("status").notNull(), // online, warning, down
-  responseTime: integer("response_time"), // milliseconds
+  response_time: integer("response_time"), // milliseconds
   details: json("details"), // additional details about the check
 });
 
 export const alerts = pgTable("alerts", {
   id: serial("id").primaryKey(),
-  deviceId: integer("device_id").notNull(),
-  monitorId: integer("monitor_id").notNull(),
+  device_id: integer("device_id").notNull(),
+  monitor_id: integer("monitor_id").notNull(),
   message: text("message").notNull(),
   severity: text("severity").notNull(), // info, warning, danger
   status: text("status").notNull().default("active"), // active, acknowledged, escalated, resolved
   timestamp: timestamp("timestamp").defaultNow(),
-  acknowledgedAt: timestamp("acknowledged_at"),
-  resolvedAt: timestamp("resolved_at"),
+  acknowledged_at: timestamp("acknowledged_at"),
+  resolved_at: timestamp("resolved_at"),
 });
 
 export const insertUserSchema = createInsertSchema(users).pick({
@@ -87,7 +87,7 @@ export const userPreferencesSchema = z.object({
 
 export const insertDeviceSchema = createInsertSchema(devices).pick({
   name: true,
-  ipAddress: true,
+  ip_address: true,
   type: true,
 });
 
