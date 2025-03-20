@@ -1,6 +1,7 @@
 import { db } from "./db";
 import { sql } from "drizzle-orm";
 import * as schema from "../shared/schema";
+import { devices, monitors, monitorResults, alerts } from "../shared/schema";
 import type { InsertDevice, InsertMonitor, InsertAlert } from "../shared/schema";
 import { storage, MemStorage } from "./storage";
 
@@ -54,18 +55,18 @@ export async function seedDatabase() {
 
     // Add sample devices
     const sampleDevices: InsertDevice[] = [
-      { name: "Core Router", ipAddress: "192.168.1.1", type: "router" },
-      { name: "Main Switch", ipAddress: "192.168.1.2", type: "switch" },
-      { name: "Distribution Switch", ipAddress: "192.168.1.3", type: "switch" },
-      { name: "Web Server", ipAddress: "192.168.1.100", type: "server" },
-      { name: "Database Server", ipAddress: "192.168.1.101", type: "server" },
-      { name: "Mail Server", ipAddress: "192.168.1.102", type: "server" },
-      { name: "Backup Server", ipAddress: "192.168.1.103", type: "server" },
-      { name: "AP Office 1", ipAddress: "192.168.1.150", type: "access_point" },
-      { name: "AP Office 2", ipAddress: "192.168.1.151", type: "access_point" },
-      { name: "AP Meeting Room", ipAddress: "192.168.1.152", type: "access_point" },
-      { name: "Firewall", ipAddress: "192.168.1.254", type: "firewall" },
-      { name: "NAS Storage", ipAddress: "192.168.1.200", type: "storage" }
+      { name: "Core Router", ip_address: "192.168.1.1", type: "router" },
+      { name: "Main Switch", ip_address: "192.168.1.2", type: "switch" },
+      { name: "Distribution Switch", ip_address: "192.168.1.3", type: "switch" },
+      { name: "Web Server", ip_address: "192.168.1.100", type: "server" },
+      { name: "Database Server", ip_address: "192.168.1.101", type: "server" },
+      { name: "Mail Server", ip_address: "192.168.1.102", type: "server" },
+      { name: "Backup Server", ip_address: "192.168.1.103", type: "server" },
+      { name: "AP Office 1", ip_address: "192.168.1.150", type: "access_point" },
+      { name: "AP Office 2", ip_address: "192.168.1.151", type: "access_point" },
+      { name: "AP Meeting Room", ip_address: "192.168.1.152", type: "access_point" },
+      { name: "Firewall", ip_address: "192.168.1.254", type: "firewall" },
+      { name: "NAS Storage", ip_address: "192.168.1.200", type: "storage" }
     ];
 
     // Insert devices and get their IDs
@@ -92,9 +93,9 @@ export async function seedDatabase() {
     for (const deviceId of deviceIds) {
       try {
         const monitor: InsertMonitor = {
-          deviceId,
+          device_id: deviceId,
           type: "icmp",
-          config: { timeout: 5, packetSize: 56, count: 3 },
+          config: { timeout: 5, packet_size: 56, count: 3 },
           enabled: true,
           interval: 60
         };
@@ -112,9 +113,9 @@ export async function seedDatabase() {
         await db
           .insert(monitorResults)
           .values({
-            monitorId: result.id,
+            monitor_id: result.id,
             status: deviceId === 3 ? "down" : deviceId === 5 ? "warning" : "online",
-            responseTime: deviceId === 5 ? 120 : deviceId === 3 ? null : Math.floor(Math.random() * 20) + 10,
+            response_time: deviceId === 5 ? 120 : deviceId === 3 ? null : Math.floor(Math.random() * 20) + 10,
             details: deviceId === 3 ? { error: "Connection refused" } : 
                     deviceId === 5 ? { warning: "High latency" } : null,
             timestamp: new Date()
@@ -128,14 +129,14 @@ export async function seedDatabase() {
     try {
       // Web Server HTTP monitor
       const httpWebMonitor: InsertMonitor = {
-        deviceId: 4, // Web Server
+        device_id: 4, // Web Server
         type: "http",
         config: { 
           url: "http://192.168.1.100", 
           method: "GET", 
-          expectedStatus: 200, 
+          expected_status: 200, 
           timeout: 5,
-          validateSSL: false
+          validate_ssl: false
         },
         enabled: true,
         interval: 60
@@ -152,14 +153,14 @@ export async function seedDatabase() {
         
       // Mail Server HTTP monitor
       const httpMailMonitor: InsertMonitor = {
-        deviceId: 6, // Mail Server
+        device_id: 6, // Mail Server
         type: "http",
         config: { 
           url: "http://192.168.1.102/webmail", 
           method: "GET", 
-          expectedStatus: 200, 
+          expected_status: 200, 
           timeout: 5,
-          validateSSL: false
+          validate_ssl: false
         },
         enabled: true,
         interval: 60
@@ -176,7 +177,7 @@ export async function seedDatabase() {
 
       // Add TCP monitors for database and mail servers
       const tcpDBMonitor: InsertMonitor = {
-        deviceId: 5, // Database Server
+        device_id: 5, // Database Server
         type: "tcp",
         config: { port: 5432, timeout: 5 },
         enabled: true,
@@ -194,7 +195,7 @@ export async function seedDatabase() {
         
       // Mail Server SMTP TCP monitor
       const tcpMailMonitor: InsertMonitor = {
-        deviceId: 6, // Mail Server
+        device_id: 6, // Mail Server
         type: "tcp",
         config: { port: 25, timeout: 5 },
         enabled: true,
