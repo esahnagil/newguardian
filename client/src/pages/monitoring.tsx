@@ -1623,7 +1623,7 @@ const Monitoring = () => /* data-replit-metadata is auto-added here, but causes 
                                     />
                                   </div>
 
-                                  <div className="p-4 h-full flex items-center justify-center">
+                                  <div className="p-4 h-full flex items-center">
                                     {/* İzleyici başlığı ve tipi */}
                                     <div className="flex items-center space-x-2">
                                       <MonitorTypeIcon type={monitor.type} />
