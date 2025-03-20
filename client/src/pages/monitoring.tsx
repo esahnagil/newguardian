@@ -443,7 +443,7 @@ const Monitoring = () => {
   const createMonitorMutation = useMutation({
     mutationFn: async (values: MonitorFormValues) => {
       const transformedData = transformFormData(values);
-      return await apiRequest('POST', '/api/monitors', transformedData as any);
+      return await apiRequest('POST', '/api/monitors', { body: JSON.stringify(transformedData) });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/monitors'] });
@@ -884,7 +884,7 @@ const Monitoring = () => {
   
   const createDeviceMutation = useMutation({
     mutationFn: async (data: DeviceFormValues) => {
-      return await apiRequest('POST', '/api/devices', data);
+      return await apiRequest('POST', '/api/devices', { body: JSON.stringify(data) });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/devices'] });
@@ -910,7 +910,7 @@ const Monitoring = () => {
     mutationFn: async (values: MonitorFormValues) => {
       if (!values.id) throw new Error("Monitor ID is required");
       const transformedData = transformFormData(values);
-      return await apiRequest('PUT', `/api/monitors/${values.id}`, transformedData);
+      return await apiRequest('PUT', `/api/monitors/${values.id}`, { body: JSON.stringify(transformedData) });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/monitors'] });
@@ -965,7 +965,7 @@ const Monitoring = () => {
           <h2 className="text-2xl font-semibold">İzleme</h2>
           <p className="text-gray-600">İzleme kontrollerini yapılandırın ve yönetin</p>
         </div>
-        <div className="flex space-x-2"> {/* Added div for side-by-side buttons */}
+        <div>
           <Dialog open={isAddDeviceOpen} onOpenChange={setIsAddDeviceOpen}>
             <DialogTrigger asChild>
               <Button>
@@ -1053,121 +1053,7 @@ const Monitoring = () => {
               </Form>
             </DialogContent>
           </Dialog>
-          <Dialog open={isAddMonitorOpen} onOpenChange={setIsAddMonitorOpen}>
-            <DialogTrigger asChild>
-              <Button>
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-5 w-5 mr-2"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 4v16m8-8H4"
-                  />
-                </svg>
-                İzleyici Ekle
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Yeni İzleyici Ekle</DialogTitle>
-              </DialogHeader>
-              <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                  <FormField
-                    control={form.control}
-                    name="deviceId"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Cihaz</FormLabel>
-                        <Select 
-                          onValueChange={(val) => field.onChange(Number(val))} 
-                          defaultValue={field.value?.toString()}
-                        >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Cihaz seçin" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            {devices?.map((device) => (
-                              <SelectItem key={device.id} value={device.id.toString()}>
-                                {device.name}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="type"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>İzleyici Tipi</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="İzleyici tipi seçin" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            {monitorTypes.map((type) => (
-                              <SelectItem key={type.value} value={type.value}>
-                                {type.label}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="enabled"
-                    render={({ field }) => (
-                      <FormItem className="flex items-center">
-                        <FormLabel>Etkin</FormLabel>
-                        <FormControl>
-                          <Switch 
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                          />
-                        </FormControl>
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="interval"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Kontrol Aralığı (saniye)</FormLabel>
-                        <FormControl>
-                          <Input type="number" min="10" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  {renderMonitorConfigFields()}
-                  <DialogFooter>
-                    <Button type="submit" disabled={createMonitorMutation.isPending}>
-                      {createMonitorMutation.isPending ? 'Oluşturuluyor...' : 'Oluştur'}
-                    </Button>
-                  </DialogFooter>
-                </form>
-              </Form>
-            </DialogContent>
-          </Dialog>
+          {/* İzleyici ekle diyaloğu kaldırıldı */}
         </div>
       </div>
 
@@ -1697,31 +1583,7 @@ const Monitoring = () => {
                               <Settings className="h-4 w-4 mr-1" />
                               Ayarlar
                             </Button>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setIsAddMonitorOpen(true);
-                                form.setValue("deviceId", device.id);
-                              }}
-                            >
-                              <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                className="h-4 w-4 mr-1"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
-                              >
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth={2}
-                                  d="M12 4v16m8-8H4"
-                                />
-                              </svg>
-                              İzleyici
-                            </Button>
+
                           </div>
                         </TableCell>
                       </TableRow>
@@ -1778,17 +1640,6 @@ const Monitoring = () => {
                         <TableRow className="bg-gray-50">
                           <TableCell colSpan={5} className="text-center py-4">
                             <p className="text-gray-500">Bu cihaz için henüz izleyici bulunmuyor.</p>
-                            <Button
-                              variant="link"
-                              size="sm"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setIsAddMonitorOpen(true);
-                                form.setValue("deviceId", device.id);
-                              }}
-                            >
-                              İzleyici Ekle
-                            </Button>
                           </TableCell>
                         </TableRow>
                       )}
