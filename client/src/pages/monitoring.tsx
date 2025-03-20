@@ -284,15 +284,12 @@ const Monitoring = () => /* data-replit-metadata is auto-added here, but causes 
     queryKey: ['/api/monitors'],
   });
 
-  // Cihazların genişletilme durumunu tutacak state
-  const [expandedDevices, setExpandedDevices] = useState<Record<number, boolean>>({});
+  // Sadece genişletilmiş cihazın ID'sini tutacak state
+  const [expandedDeviceId, setExpandedDeviceId] = useState<number | null>(null);
 
   // Genişlet/daralt toggle fonksiyonu
   const toggleDeviceExpanded = (deviceId: number) => {
-    setExpandedDevices(prev => ({
-      ...prev,
-      [deviceId]: !prev[deviceId]
-    }));
+    setExpandedDeviceId(prev => prev === deviceId ? null : deviceId);
   };
 
   // Cihaz ayarları panelini aç
@@ -1506,7 +1503,7 @@ const Monitoring = () => /* data-replit-metadata is auto-added here, but causes 
                   const deviceMonitors = monitors?.filter(m => m.deviceId === device.id) || [];
                   const totalMonitors = deviceMonitors.length;
                   const activeMonitors = deviceMonitors.filter(m => m.enabled).length;
-                  const isExpanded = expandedDevices[device.id] || false;
+                  const isExpanded = expandedDeviceId === device.id;
 
                   // Cihazın genel durumunu belirle (en az bir izleyici varsa)
                   let overallStatus = 'unknown';
