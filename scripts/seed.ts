@@ -102,7 +102,7 @@ async function seedDatabase() {
     
     // Microsoft Azure HTTP monitor
     const httpAzureMonitor = await db.insert(monitors).values({
-      deviceId: deviceIds[3], // Microsoft Azure
+      device_id: deviceIds[3], // Microsoft Azure
       type: "http",
       config: { 
         url: "https://azure.microsoft.com", 
@@ -113,13 +113,13 @@ async function seedDatabase() {
       },
       enabled: true,
       interval: 60,
-      createdAt: new Date(),
-      updatedAt: new Date()
+      created_at: new Date(),
+      updated_at: new Date()
     }).returning();
     
     // Facebook HTTP monitor
     const httpFacebookMonitor = await db.insert(monitors).values({
-      deviceId: deviceIds[5], // Facebook
+      device_id: deviceIds[5], // Facebook
       type: "http",
       config: { 
         url: "https://facebook.com", 
@@ -130,72 +130,72 @@ async function seedDatabase() {
       },
       enabled: true,
       interval: 60,
-      createdAt: new Date(),
-      updatedAt: new Date()
+      created_at: new Date(),
+      updated_at: new Date()
     }).returning();
     
     // Alibaba Cloud TCP monitor
     const tcpAlibabaMonitor = await db.insert(monitors).values({
-      deviceId: deviceIds[4], // Alibaba Cloud
+      device_id: deviceIds[4], // Alibaba Cloud
       type: "tcp",
       config: { port: 443, timeout: 5 },
       enabled: true,
       interval: 60,
-      createdAt: new Date(),
-      updatedAt: new Date()
+      created_at: new Date(),
+      updated_at: new Date()
     }).returning();
     
     // Facebook TCP monitor
     const tcpFacebookMonitor = await db.insert(monitors).values({
-      deviceId: deviceIds[5], // Facebook
+      device_id: deviceIds[5], // Facebook
       type: "tcp",
       config: { port: 443, timeout: 5 },
       enabled: true,
       interval: 60,
-      createdAt: new Date(),
-      updatedAt: new Date()
+      created_at: new Date(),
+      updated_at: new Date()
     }).returning();
 
     // Add some alerts
-    const alerts = [
+    const alertsData = [
       {
-        deviceId: deviceIds[3], // Microsoft Azure
-        monitorId: httpAzureMonitor[0].id,
+        device_id: deviceIds[3], // Microsoft Azure
+        monitor_id: httpAzureMonitor[0].id,
         message: "Microsoft Azure HTTP Error",
         severity: "danger",
         status: "active"
       },
       {
-        deviceId: deviceIds[4], // Alibaba Cloud
-        monitorId: tcpAlibabaMonitor[0].id,
+        device_id: deviceIds[4], // Alibaba Cloud
+        monitor_id: tcpAlibabaMonitor[0].id,
         message: "Alibaba Cloud High Latency",
         severity: "warning",
         status: "active"
       },
       {
-        deviceId: deviceIds[5], // Facebook
-        monitorId: httpFacebookMonitor[0].id,
+        device_id: deviceIds[5], // Facebook
+        monitor_id: httpFacebookMonitor[0].id,
         message: "Facebook Connection Error",
         severity: "danger",
         status: "active"
       },
       {
-        deviceId: deviceIds[5], // Facebook
-        monitorId: tcpFacebookMonitor[0].id,
+        device_id: deviceIds[5], // Facebook
+        monitor_id: tcpFacebookMonitor[0].id,
         message: "Facebook SSL Certificate Issue",
         severity: "warning",
         status: "active"
       },
       {
-        deviceId: deviceIds[7], // Netflix CDN
-        monitorId: deviceIds[7] + 1, // Assuming the monitor ID follows device ID pattern
+        device_id: deviceIds[7], // Netflix CDN
+        monitor_id: deviceIds[7] + 1, // Assuming the monitor ID follows device ID pattern
         message: "Netflix CDN Response Time Issue",
         severity: "warning",
         status: "active"
       }
     ];
 
-    for (const alert of alerts) {
+    for (const alert of alertsData) {
       await db.insert(alerts).values({
         ...alert,
         timestamp: new Date()
