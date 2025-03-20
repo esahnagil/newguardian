@@ -1597,10 +1597,18 @@ const Monitoring = () => {
                               {deviceMonitors.map(monitor => (
                                 <div
                                   key={`${device.id}-${monitor.id}`}
-                                  className="border rounded-lg shadow-sm bg-white relative"
+                                  className="border rounded-lg shadow-sm bg-white relative cursor-pointer hover:shadow-md transition-shadow"
+                                  onClick={() => {
+                                    // Önce cihaz ayarları sayfasını aç
+                                    handleDeviceSettings(device);
+                                    // Seçili izleyiciyi düzenleme için ayarla (bu kısmı implementasyona eklemek gerekiyor)
+                                    if (selectedMonitorType === null) {
+                                      setSelectedMonitorType(monitor.type as any);
+                                    }
+                                  }}
                                 >
-                                  {/* Çark ikonu - sağ üst köşede */}
-                                  <div className="absolute top-2 right-2">
+                                  {/* Aç/Kapat switch'i sağ üst köşede */}
+                                  <div className="absolute top-2 right-2" onClick={(e) => e.stopPropagation()}>
                                     <Switch
                                       checked={monitor.enabled}
                                       onCheckedChange={() => handleToggleMonitor(monitor.id, monitor.enabled)}
@@ -1618,14 +1626,6 @@ const Monitoring = () => {
                                       <span className="font-medium">
                                         {monitorTypes.find(t => t.value === monitor.type)?.label || monitor.type}
                                       </span>
-                                    </div>
-
-                                    {/* İzleyici bilgileri */}
-                                    <div className="space-y-2 text-sm text-gray-600">
-                                      <div className="flex justify-between items-center mt-4">
-                                        <span>Kontrol Aralığı</span>
-                                        <span>{monitor.interval} saniye</span>
-                                      </div>
                                     </div>
                                   </div>
                                 </div>
