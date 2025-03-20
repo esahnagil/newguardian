@@ -1,9 +1,31 @@
 import { db } from "../server/db";
 import { sql } from "drizzle-orm";
 import { 
-  users, devices, monitors, monitorResults, alerts,
-  InsertDevice, InsertMonitor, InsertAlert
+  users, devices, monitors, monitorResults, alerts
 } from "../shared/schema";
+
+// Tip tanımlamaları
+interface InsertDevice {
+  name: string;
+  ipAddress: string;
+  type: string;
+}
+
+interface InsertMonitor {
+  deviceId: number;
+  type: string;
+  config: any;
+  enabled: boolean;
+  interval: number;
+}
+
+interface InsertAlert {
+  deviceId: number;
+  monitorId: number;
+  message: string;
+  severity: string;
+  status: string;
+}
 
 async function seedDatabase() {
   try {
@@ -17,20 +39,20 @@ async function seedDatabase() {
     
     console.log("Seeding database with initial data...");
 
-    // Sample devices data
+    // Sample devices data - Internet services
     const sampleDevices = [
-      { name: "Core Router", ipAddress: "192.168.1.1", type: "router" },
-      { name: "Main Switch", ipAddress: "192.168.1.2", type: "switch" },
-      { name: "Distribution Switch", ipAddress: "192.168.1.3", type: "switch" },
-      { name: "Web Server", ipAddress: "192.168.1.100", type: "server" },
-      { name: "Database Server", ipAddress: "192.168.1.101", type: "server" },
-      { name: "Mail Server", ipAddress: "192.168.1.102", type: "server" },
-      { name: "Backup Server", ipAddress: "192.168.1.103", type: "server" },
-      { name: "AP Office 1", ipAddress: "192.168.1.150", type: "access_point" },
-      { name: "AP Office 2", ipAddress: "192.168.1.151", type: "access_point" },
-      { name: "AP Meeting Room", ipAddress: "192.168.1.152", type: "access_point" },
-      { name: "Firewall", ipAddress: "192.168.1.254", type: "firewall" },
-      { name: "NAS Storage", ipAddress: "192.168.1.200", type: "storage" }
+      { name: "Google Search", ipAddress: "142.250.187.78", type: "server" },
+      { name: "Amazon Web Services", ipAddress: "54.239.28.85", type: "server" },
+      { name: "Cloudflare DNS", ipAddress: "1.1.1.1", type: "dns" },
+      { name: "Microsoft Azure", ipAddress: "20.43.161.1", type: "server" },
+      { name: "Alibaba Cloud", ipAddress: "140.205.94.189", type: "server" },
+      { name: "Facebook", ipAddress: "157.240.192.35", type: "server" },
+      { name: "Twitter", ipAddress: "104.244.42.1", type: "server" },
+      { name: "Netflix CDN", ipAddress: "198.38.96.0", type: "cdn" },
+      { name: "Akamai CDN", ipAddress: "23.15.146.169", type: "cdn" },
+      { name: "GitHub", ipAddress: "140.82.121.4", type: "server" },
+      { name: "Cloudfront CDN", ipAddress: "13.224.64.0", type: "cdn" },
+      { name: "Fastly CDN", ipAddress: "151.101.1.164", type: "cdn" }
     ];
 
     // Insert devices and collect their IDs
@@ -39,10 +61,10 @@ async function seedDatabase() {
     for (const device of sampleDevices) {
       const result = await db.insert(devices).values({
         name: device.name,
-        ipAddress: device.ipAddress,
+        ip_address: device.ipAddress,
         type: device.type,
-        createdAt: new Date(),
-        updatedAt: new Date()
+        created_at: new Date(),
+        updated_at: new Date()
       }).returning();
       
       deviceIds.push(result[0].id);
@@ -53,23 +75,23 @@ async function seedDatabase() {
       const deviceId = deviceIds[i];
       
       // ICMP monitor
-      const monitorResult = await db.insert(schema.monitors).values({
-        deviceId,
+      const monitorResult = await db.insert(monitors).values({
+        device_id: deviceId,
         type: "icmp",
         config: { timeout: 5, packetSize: 56, count: 3 },
         enabled: true,
         interval: 60,
-        createdAt: new Date(),
-        updatedAt: new Date()
+        created_at: new Date(),
+        updated_at: new Date()
       }).returning();
       
       const monitorId = monitorResult[0].id;
       
       // Initial monitor result
-      await db.insert(schema.monitorResults).values({
-        monitorId,
+      await db.insert(monitorResults).values({
+        monitor_id: monitorId,
         status: deviceId === 4 ? "down" : deviceId === 5 ? "warning" : "online",
-        responseTime: deviceId === 5 ? 120 : deviceId === 4 ? null : Math.floor(Math.random() * 20) + 10,
+        response_time: deviceId === 5 ? 120 : deviceId === 4 ? null : Math.floor(Math.random() * 20) + 10,
         details: deviceId === 4 ? { error: "Connection refused" } : 
                  deviceId === 5 ? { warning: "High latency" } : null,
         timestamp: new Date()
@@ -78,16 +100,16 @@ async function seedDatabase() {
 
     // Add specialized monitors
     
-    // Web Server HTTP monitor
-    const httpWebMonitor = await db.insert(schema.monitors).values({
-      deviceId: deviceIds[3], // Web Server
+    // Microsoft Azure HTTP monitor
+    const httpAzureMonitor = await db.insert(monitors).values({
+      deviceId: deviceIds[3], // Microsoft Azure
       type: "http",
       config: { 
-        url: "http://192.168.1.100", 
+        url: "https://azure.microsoft.com", 
         method: "GET", 
         expectedStatus: 200, 
         timeout: 5,
-        validateSSL: false
+        validateSSL: true
       },
       enabled: true,
       interval: 60,
@@ -95,16 +117,16 @@ async function seedDatabase() {
       updatedAt: new Date()
     }).returning();
     
-    // Mail Server HTTP monitor
-    const httpMailMonitor = await db.insert(schema.monitors).values({
-      deviceId: deviceIds[5], // Mail Server
+    // Facebook HTTP monitor
+    const httpFacebookMonitor = await db.insert(monitors).values({
+      deviceId: deviceIds[5], // Facebook
       type: "http",
       config: { 
-        url: "http://192.168.1.102/webmail", 
+        url: "https://facebook.com", 
         method: "GET", 
         expectedStatus: 200, 
         timeout: 5,
-        validateSSL: false
+        validateSSL: true
       },
       enabled: true,
       interval: 60,
@@ -112,22 +134,22 @@ async function seedDatabase() {
       updatedAt: new Date()
     }).returning();
     
-    // Database Server TCP monitor
-    const tcpDBMonitor = await db.insert(schema.monitors).values({
-      deviceId: deviceIds[4], // Database Server
+    // Alibaba Cloud TCP monitor
+    const tcpAlibabaMonitor = await db.insert(monitors).values({
+      deviceId: deviceIds[4], // Alibaba Cloud
       type: "tcp",
-      config: { port: 5432, timeout: 5 },
+      config: { port: 443, timeout: 5 },
       enabled: true,
       interval: 60,
       createdAt: new Date(),
       updatedAt: new Date()
     }).returning();
     
-    // Mail Server SMTP TCP monitor
-    const tcpMailMonitor = await db.insert(schema.monitors).values({
-      deviceId: deviceIds[5], // Mail Server
+    // Facebook TCP monitor
+    const tcpFacebookMonitor = await db.insert(monitors).values({
+      deviceId: deviceIds[5], // Facebook
       type: "tcp",
-      config: { port: 25, timeout: 5 },
+      config: { port: 443, timeout: 5 },
       enabled: true,
       interval: 60,
       createdAt: new Date(),
@@ -137,44 +159,44 @@ async function seedDatabase() {
     // Add some alerts
     const alerts = [
       {
-        deviceId: deviceIds[3],
-        monitorId: httpWebMonitor[0].id,
-        message: "Web Server Offline",
+        deviceId: deviceIds[3], // Microsoft Azure
+        monitorId: httpAzureMonitor[0].id,
+        message: "Microsoft Azure HTTP Error",
         severity: "danger",
         status: "active"
       },
       {
-        deviceId: deviceIds[4],
-        monitorId: tcpDBMonitor[0].id,
-        message: "High CPU Usage",
+        deviceId: deviceIds[4], // Alibaba Cloud
+        monitorId: tcpAlibabaMonitor[0].id,
+        message: "Alibaba Cloud High Latency",
         severity: "warning",
         status: "active"
       },
       {
-        deviceId: deviceIds[5],
-        monitorId: httpMailMonitor[0].id,
-        message: "Mail Server HTTP Error",
+        deviceId: deviceIds[5], // Facebook
+        monitorId: httpFacebookMonitor[0].id,
+        message: "Facebook Connection Error",
         severity: "danger",
         status: "active"
       },
       {
-        deviceId: deviceIds[5],
-        monitorId: tcpMailMonitor[0].id,
-        message: "Mail Server SMTP Error",
+        deviceId: deviceIds[5], // Facebook
+        monitorId: tcpFacebookMonitor[0].id,
+        message: "Facebook SSL Certificate Issue",
         severity: "warning",
         status: "active"
       },
       {
-        deviceId: deviceIds[7], // AP Office 1
+        deviceId: deviceIds[7], // Netflix CDN
         monitorId: deviceIds[7] + 1, // Assuming the monitor ID follows device ID pattern
-        message: "AP Response Time",
+        message: "Netflix CDN Response Time Issue",
         severity: "warning",
         status: "active"
       }
     ];
 
     for (const alert of alerts) {
-      await db.insert(schema.alerts).values({
+      await db.insert(alerts).values({
         ...alert,
         timestamp: new Date()
       });

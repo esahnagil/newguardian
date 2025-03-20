@@ -1,83 +1,80 @@
-# NewGuardian - Ağ İzleme Aracı
+# NewGuardian - Sistem İzleme Aracı
 
-Bu proje, ağ cihazlarını izlemek ve uyarılar oluşturmak için kullanılan bir web uygulamasıdır.
+Web tabanlı, açık kaynaklı sistem ve ağ izleme uygulaması.
 
 ## Özellikler
 
-- Cihaz yönetimi (router, switch, server, access point vb.)
-- ICMP, HTTP, TCP ve SNMP protokolleri ile izleme
-- Gerçek zamanlı izleme ve bildirimler
-- Dashboard ile genel sistem durumu takibi
-- Alarm yönetimi
+- Web arayüzü ile kolay kullanım
+- Gerçek zamanlı monitörleme (WebSockets)
+- ICMP, SNMP, HTTP ve TCP protokolleri desteği
+- Alarm ve bildirim sistemi
+- Roller bazlı erişim kontrolü
+- Mobil uyumlu tasarım
 
-## Kurulum Adımları
+## Kurulum
 
-### Ön Gereksinimler
+### Gereksinimler
 
-- Node.js (v16 veya üzeri)
+- Node.js 16+
 - PostgreSQL veritabanı
 
-### 1. Depoyu Klonlayın
+### Adımlar
 
+1. Depoyu klonlayın:
 ```bash
-git clone https://github.com/esahnagil/newguardian.git
+git clone https://github.com/yourusername/newguardian.git
 cd newguardian
 ```
 
-### 2. Bağımlılıkları Yükleyin
-
+2. Bağımlılıkları yükleyin:
 ```bash
 npm install
 ```
 
-### 3. Veritabanını Hazırlayın
+3. PostgreSQL veritabanı oluşturun.
 
-PostgreSQL veritabanı oluşturun ve bağlantı bilgilerini .env dosyasına ekleyin:
-
+4. `.env` dosyasını oluşturun:
 ```
 DATABASE_URL=postgresql://username:password@localhost:5432/newguardian
 ```
 
-Veritabanı tablolarını oluşturun:
-
+5. Veritabanını oluşturun ve test verileriyle doldurun:
 ```bash
-cat migrations/init.sql | psql $DATABASE_URL
+chmod +x scripts/setup.sh
+./scripts/setup.sh
 ```
 
-### 4. Test Verilerini Yükleyin
-
-```bash
-npx tsx scripts/seed.ts
-```
-
-### 5. Uygulamayı Başlatın
-
+6. Uygulamayı başlatın:
 ```bash
 npm run dev
 ```
 
-Uygulama http://localhost:5000 adresinde çalışacaktır.
+7. Web tarayıcısından `http://localhost:5000` adresine gidin.
 
-## Hızlı Kurulum
+## Replit'te Kullanım
 
-Tüm kurulum adımlarını otomatikleştirmek için aşağıdaki komutu çalıştırabilirsiniz:
+Replit'te otomatik olarak kurulum yapmak için:
+
+1. Uygulamayı başlatın.
+2. Uygulama otomatik olarak veritabanı tablolarını oluşturacaktır.
+
+Eğer veritabanını sıfırlamak ve test verileriyle yeniden doldurmak isterseniz:
 
 ```bash
 ./scripts/setup.sh
 ```
 
-## Kullanıcı Bilgileri
+komutunu çalıştırabilirsiniz.
 
-Varsayılan olarak aşağıdaki kullanıcı oluşturulur:
+## Giriş Bilgileri
 
-- Kullanıcı adı: admin
-- Şifre: password
+- Kullanıcı Adı: `admin`
+- Şifre: `admin123`
 
-İlk girişten sonra şifrenizi değiştirmeniz önerilir.
+## Katkıda Bulunma
 
-## Teknolojiler
+Katkılarınızı, önerilerinizi ve hata raporlarınızı GitHub üzerinden iletebilirsiniz.
 
-- Frontend: React, Tailwind CSS, shadcn/ui, React Query
-- Backend: Express.js, Drizzle ORM
-- Veritabanı: PostgreSQL
-- WebSocket: Socket.io
+## Lisans
+
+MIT
