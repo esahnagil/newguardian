@@ -214,36 +214,36 @@ export async function seedDatabase() {
       // Add some alerts
       const alertData: InsertAlert[] = [
         {
-          deviceId: 4,
-          monitorId: httpWebResult.id,
+          device_id: 4,
+          monitor_id: httpWebResult.id,
           message: "Web Server Offline",
           severity: "danger",
           status: "active"
         },
         {
-          deviceId: 5,
-          monitorId: tcpDBResult.id,
+          device_id: 5,
+          monitor_id: tcpDBResult.id,
           message: "High CPU Usage",
           severity: "warning",
           status: "active"
         },
         {
-          deviceId: 6,
-          monitorId: httpMailResult.id,
+          device_id: 6,
+          monitor_id: httpMailResult.id,
           message: "Mail Server HTTP Error",
           severity: "danger",
           status: "active"
         },
         {
-          deviceId: 6,
-          monitorId: tcpMailResult.id,
+          device_id: 6,
+          monitor_id: tcpMailResult.id,
           message: "Mail Server SMTP Error",
           severity: "warning",
           status: "active"
         },
         {
-          deviceId: 8,
-          monitorId: 8, // ICMP monitor for AP
+          device_id: 8,
+          monitor_id: 8, // ICMP monitor for AP
           message: "AP Response Time",
           severity: "warning",
           status: "active"
