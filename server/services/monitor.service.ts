@@ -87,7 +87,7 @@ export class MonitorService {
    */
   private async checkMonitor(monitor: Monitor) {
     try {
-      const device = await this.storage.getDevice(monitor.deviceId);
+      const device = await this.storage.getDevice(monitor.device_id);
       
       if (!device) {
         console.error(`Device not found for monitor ${monitor.id}`);
@@ -150,8 +150,8 @@ export class MonitorService {
         const message = this.generateAlertMessage(device, monitor, status);
         
         const alert = await this.storage.createAlert({
-          deviceId: device.id,
-          monitorId: monitor.id,
+          device_id: device.id,
+          monitor_id: monitor.id,
           message,
           severity,
           status: 'active'
@@ -163,8 +163,8 @@ export class MonitorService {
       
       // Notify listeners about the updated monitor result
       this.notifyListeners('monitorResult', {
-        monitorId: monitor.id,
-        deviceId: device.id,
+        monitor_id: monitor.id,
+        device_id: device.id,
         result
       });
       
@@ -182,7 +182,7 @@ export class MonitorService {
     details?: any;
   }> {
     try {
-      const result = await ICMPService.ping(device.ipAddress, config);
+      const result = await ICMPService.ping(device.ip_address, config);
       
       if (!result.success) {
         return {
@@ -222,7 +222,7 @@ export class MonitorService {
     details?: any;
   }> {
     try {
-      const result = await SNMPService.get(device.ipAddress, config);
+      const result = await SNMPService.get(device.ip_address, config);
       
       if (!result.success) {
         return {
@@ -284,7 +284,7 @@ export class MonitorService {
           status: 'down',
           responseTime: result.responseTime,
           details: { 
-            error: result.error || `HTTP status ${result.statusCode} does not match expected ${config.expectedStatus || 200}`,
+            error: result.error || `HTTP status ${result.statusCode} does not match expected ${config.expected_status || 200}`,
             statusCode: result.statusCode
           }
         };
@@ -329,7 +329,7 @@ export class MonitorService {
     details?: any;
   }> {
     try {
-      const result = await TCPService.checkPort(device.ipAddress, config);
+      const result = await TCPService.checkPort(device.ip_address, config);
       
       if (!result.success) {
         return {

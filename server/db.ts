@@ -1,10 +1,10 @@
-import { drizzle } from "drizzle-orm/postgres-js";
+import { drizzle, PostgresJsDatabase } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
 import * as schema from "../shared/schema";
 
 // Create a mock database client if DATABASE_URL is not set
-let client;
-let db;
+let client: postgres.Sql<{}>;
+let db: PostgresJsDatabase<typeof schema>;
 
 try {
   if (process.env.DATABASE_URL) {
@@ -15,12 +15,14 @@ try {
   } else {
     console.log("DATABASE_URL not set, using in-memory storage instead");
     // Create a mock db object that will not be used when MemStorage is active
-    db = {} as typeof schema;
+    client = {} as postgres.Sql<{}>;
+    db = {} as PostgresJsDatabase<typeof schema>;
   }
 } catch (error) {
   console.error("Error initializing database:", error);
   // Create a mock db object that will not be used when MemStorage is active
-  db = {} as typeof schema;
+  client = {} as postgres.Sql<{}>;
+  db = {} as PostgresJsDatabase<typeof schema>;
 }
 
 export { db };

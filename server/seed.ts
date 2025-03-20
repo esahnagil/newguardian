@@ -11,14 +11,26 @@ import { PostgresJsDatabase } from "drizzle-orm/postgres-js";
  */
 async function checkTablesExist() {
   try {
-    const tablesExist = await db.execute(sql`
-      SELECT COUNT(*) FROM information_schema.tables 
-      WHERE table_name IN ('devices', 'monitors', 'monitor_results', 'alerts');
-    `);
+    // PostgreSQL veritabanında doğrudan sorgu yaparak tabloları kontrol et
+    const query = `
+      SELECT COUNT(*) as count FROM information_schema.tables 
+      WHERE table_name IN ('devices', 'monitors', 'monitor_results', 'alerts')
+      AND table_schema = 'public';
+    `;
     
-    // rows dizisini ve count değerini kontrol et
-    if (tablesExist && tablesExist.rows && tablesExist.rows.length > 0) {
-      return parseInt(tablesExist.rows[0].count) >= 4;
+    // Doğrudan veritabanına sorgu gönder
+    if (process.env.DATABASE_URL) {
+      // Eğer kullanılan bir şey (Drizzle db) çalışmıyorsa, client'ı doğrudan kullan
+      const postgres = await import('postgres');
+      const sql = postgres.default(process.env.DATABASE_URL);
+      const result = await sql.unsafe(query);
+      
+      if (result && result.length > 0) {
+        const count = parseInt(result[0].count);
+        await sql.end();
+        return count >= 4;
+      }
+      await sql.end();
     }
     return false;
   } catch (error) {
@@ -79,8 +91,8 @@ export async function seedDatabase() {
           .insert(devices)
           .values({
             ...device,
-            createdAt: new Date(),
-            updatedAt: new Date()
+            created_at: new Date(),
+            updated_at: new Date()
           })
           .returning();
 
@@ -105,8 +117,8 @@ export async function seedDatabase() {
           .insert(monitors)
           .values({
             ...monitor,
-            createdAt: new Date(),
-            updatedAt: new Date()
+            created_at: new Date(),
+            updated_at: new Date()
           })
           .returning();
 
@@ -147,8 +159,8 @@ export async function seedDatabase() {
         .insert(monitors)
         .values({
           ...httpWebMonitor,
-          createdAt: new Date(),
-          updatedAt: new Date()
+          created_at: new Date(),
+          updated_at: new Date()
         })
         .returning();
         
@@ -171,8 +183,8 @@ export async function seedDatabase() {
         .insert(monitors)
         .values({
           ...httpMailMonitor,
-          createdAt: new Date(),
-          updatedAt: new Date()
+          created_at: new Date(),
+          updated_at: new Date()
         })
         .returning();
 
@@ -189,8 +201,8 @@ export async function seedDatabase() {
         .insert(monitors)
         .values({
           ...tcpDBMonitor,
-          createdAt: new Date(),
-          updatedAt: new Date()
+          created_at: new Date(),
+          updated_at: new Date()
         })
         .returning();
         
@@ -207,8 +219,8 @@ export async function seedDatabase() {
         .insert(monitors)
         .values({
           ...tcpMailMonitor,
-          createdAt: new Date(),
-          updatedAt: new Date()
+          created_at: new Date(),
+          updated_at: new Date()
         })
         .returning();
 

@@ -581,8 +581,8 @@ export class DatabaseStorage implements IStorage {
       .insert(monitors)
       .values({
         ...insertMonitor,
-        createdAt: now,
-        updatedAt: now
+        created_at: now,
+        updated_at: now
       })
       .returning();
     return monitor;
@@ -593,7 +593,7 @@ export class DatabaseStorage implements IStorage {
       .update(monitors)
       .set({
         ...partialMonitor,
-        updatedAt: new Date()
+        updated_at: new Date()
       })
       .where(eq(monitors.id, id))
       .returning();
@@ -644,10 +644,10 @@ export class DatabaseStorage implements IStorage {
     const [result] = await db
       .insert(monitorResults)
       .values({
-        monitorId,
+        monitor_id: monitorId,
         status,
-        responseTime,
-        details,
+        response_time: responseTime || null,
+        details: details || {},
         timestamp: new Date()
       })
       .returning();

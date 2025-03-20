@@ -15,7 +15,8 @@ export class HTTPService {
     const startTime = Date.now();
     
     try {
-      const { url, method, headers, body, timeout, validateSSL } = config;
+      const { url, method, headers, body, timeout } = config;
+      const validateSSL = config.validate_ssl;
       
       // Setup request options
       const options = {
@@ -36,7 +37,7 @@ export class HTTPService {
         : (response.data ? JSON.stringify(response.data).length : 0);
       
       // Check if the status code matches the expected status
-      const expectedStatus = config.expectedStatus || 200;
+      const expectedStatus = config.expected_status || 200;
       const success = response.status === expectedStatus;
       
       return {
