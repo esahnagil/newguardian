@@ -1,68 +1,83 @@
-# Network Monitoring Tool
+# NewGuardian - Ağ İzleme Aracı
 
-Ağ izleme ve cihaz durumu takip sistemi. Bu araç ile ağınızdaki cihazları izleyebilir, durum değişikliklerini takip edebilir ve sorunlara hızlıca müdahale edebilirsiniz.
+Bu proje, ağ cihazlarını izlemek ve uyarılar oluşturmak için kullanılan bir web uygulamasıdır.
 
 ## Özellikler
 
-- **Gerçek zamanlı izleme**: Cihazların durumunu WebSocket bağlantısı üzerinden gerçek zamanlı olarak takip edin
-- **ICMP, HTTP, TCP, SNMP izleme**: Farklı protokoller ile cihazları izleme
-- **Alarm sistemi**: Durum değişikliklerinde otomatik alarm oluşturma ve yönetimi
-- **Veritabanı desteği**: PostgreSQL veritabanı veya in-memory depolama seçenekleri
-- **Responsive tasarım**: Mobil cihazlarda da kullanılabilir arayüz
+- Cihaz yönetimi (router, switch, server, access point vb.)
+- ICMP, HTTP, TCP ve SNMP protokolleri ile izleme
+- Gerçek zamanlı izleme ve bildirimler
+- Dashboard ile genel sistem durumu takibi
+- Alarm yönetimi
 
-## Kurulum
+## Kurulum Adımları
 
-### Kolay Kurulum
+### Ön Gereksinimler
 
-Otomatik kurulum için:
+- Node.js (v16 veya üzeri)
+- PostgreSQL veritabanı
+
+### 1. Depoyu Klonlayın
+
+```bash
+git clone https://github.com/esahnagil/newguardian.git
+cd newguardian
+```
+
+### 2. Bağımlılıkları Yükleyin
 
 ```bash
 npm install
-node install.js
 ```
 
-Bu komut, gerekli tüm bağımlılıkları yükleyecek ve veritabanı yapılandırması için size rehberlik edecektir.
+### 3. Veritabanını Hazırlayın
 
-### Manuel Kurulum
+PostgreSQL veritabanı oluşturun ve bağlantı bilgilerini .env dosyasına ekleyin:
 
-1. Bağımlılıkları yükleyin:
-   ```bash
-   npm install
-   ```
+```
+DATABASE_URL=postgresql://username:password@localhost:5432/newguardian
+```
 
-2. Veritabanı bağlantısını yapılandırın (isteğe bağlı):
-   ```bash
-   # .env dosyası oluşturun
-   echo "DATABASE_URL=postgresql://kullanici:sifre@localhost:5432/veritabani" > .env
-   
-   # Veritabanı şemasını oluşturun
-   npx drizzle-kit push
-   ```
+Veritabanı tablolarını oluşturun:
 
-3. Uygulamayı başlatın:
-   ```bash
-   npm run dev
-   ```
+```bash
+cat migrations/init.sql | psql $DATABASE_URL
+```
 
-## Kullanım
+### 4. Test Verilerini Yükleyin
 
-- Tarayıcınızda `http://localhost:5000` adresine gidin
-- Dashboard sayfasında ağınızın genel durumunu görüntüleyin
-- Cihazlar sayfasında yeni cihazlar ekleyin
-- Her cihaz için özel izleme yapılandırması oluşturun
+```bash
+npx tsx scripts/seed.ts
+```
 
-## Bağımlılıklar ve Detaylı Bilgi
+### 5. Uygulamayı Başlatın
 
-Projenin bağımlılıkları ve teknik detayları hakkında daha fazla bilgi için `PROJECT_DEPENDENCIES.md` dosyasına bakın.
+```bash
+npm run dev
+```
 
-## Katkıda Bulunma
+Uygulama http://localhost:5000 adresinde çalışacaktır.
 
-1. Bu depoyu fork edin
-2. Özellik dalı oluşturun (`git checkout -b yeni-ozellik`)
-3. Değişikliklerinizi commit edin (`git commit -am 'Yeni özellik: xyz eklendi'`)
-4. Dalınıza push yapın (`git push origin yeni-ozellik`)
-5. Pull request oluşturun
+## Hızlı Kurulum
 
-## Lisans
+Tüm kurulum adımlarını otomatikleştirmek için aşağıdaki komutu çalıştırabilirsiniz:
 
-MIT Lisansı altında yayınlanmıştır.
+```bash
+./scripts/setup.sh
+```
+
+## Kullanıcı Bilgileri
+
+Varsayılan olarak aşağıdaki kullanıcı oluşturulur:
+
+- Kullanıcı adı: admin
+- Şifre: password
+
+İlk girişten sonra şifrenizi değiştirmeniz önerilir.
+
+## Teknolojiler
+
+- Frontend: React, Tailwind CSS, shadcn/ui, React Query
+- Backend: Express.js, Drizzle ORM
+- Veritabanı: PostgreSQL
+- WebSocket: Socket.io

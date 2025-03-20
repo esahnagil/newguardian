@@ -1,11 +1,14 @@
 import { db } from "../server/db";
-import * as schema from "../shared/schema";
 import { sql } from "drizzle-orm";
+import { 
+  users, devices, monitors, monitorResults, alerts,
+  InsertDevice, InsertMonitor, InsertAlert
+} from "../shared/schema";
 
 async function seedDatabase() {
   try {
     // Check if devices table is already populated
-    const devicesCount = await db.select({ count: sql`count(*)` }).from(schema.devices);
+    const devicesCount = await db.select({ count: sql`count(*)` }).from(devices);
     
     if (parseInt(devicesCount[0].count) > 0) {
       console.log("Database already has data, skipping seed operation");
@@ -34,7 +37,7 @@ async function seedDatabase() {
     const deviceIds: number[] = [];
     
     for (const device of sampleDevices) {
-      const result = await db.insert(schema.devices).values({
+      const result = await db.insert(devices).values({
         name: device.name,
         ipAddress: device.ipAddress,
         type: device.type,
