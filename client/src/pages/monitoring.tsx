@@ -250,6 +250,7 @@ const Monitoring = () => {
   const [selectedMonitorType, setSelectedMonitorType] = useState<"icmp" | "snmp" | "http" | "tcp" | null>(null);
   const [selectedDevice, setSelectedDevice] = useState<Device | null>(null);
   const [isDeviceSheetOpen, setIsDeviceSheetOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState("info");
   const [isAddDeviceOpen, setIsAddDeviceOpen] = useState(false); // Added state for Add Device dialog
 
   // Fetch devices
@@ -295,11 +296,16 @@ const Monitoring = () => {
   };
 
   // Cihaz ayarları panelini aç
-  const handleDeviceSettings = (device: Device, e?: React.MouseEvent) => {
+  const handleDeviceSettings = (
+    device: Device, 
+    monitorTab: boolean = false, 
+    e?: React.MouseEvent<HTMLButtonElement, MouseEvent> | React.MouseEvent
+  ) => {
     if (e) {
       e.stopPropagation();
     }
     setSelectedDevice(device);
+    setActiveTab(monitorTab ? "monitors" : "info");
     setIsDeviceSheetOpen(true);
   };
 
@@ -1068,7 +1074,7 @@ const Monitoring = () => {
           </SheetHeader>
 
           <div className="py-6 space-y-6">
-            <Tabs defaultValue="info" className="w-full">
+            <Tabs defaultValue={activeTab} className="w-full">
               <TabsList className="grid w-full grid-cols-3 mb-4">
                 <TabsTrigger value="info">Bilgiler</TabsTrigger>
                 <TabsTrigger value="settings">Ayarlar</TabsTrigger>
@@ -1577,7 +1583,7 @@ const Monitoring = () => {
                               size="sm"
                               onClick={(e) => {
                                 e.stopPropagation();
-                                handleDeviceSettings(device, e);
+                                handleDeviceSettings(device, false, e);
                               }}
                             >
                               <Settings className="h-4 w-4 mr-1" />
@@ -1599,12 +1605,10 @@ const Monitoring = () => {
                                   key={`${device.id}-${monitor.id}`}
                                   className="border rounded-lg shadow-sm bg-white relative cursor-pointer hover:shadow-md transition-shadow"
                                   onClick={() => {
-                                    // Önce cihaz ayarları sayfasını aç
-                                    handleDeviceSettings(device);
-                                    // Seçili izleyiciyi düzenleme için ayarla (bu kısmı implementasyona eklemek gerekiyor)
-                                    if (selectedMonitorType === null) {
-                                      setSelectedMonitorType(monitor.type as any);
-                                    }
+                                    // Önce cihaz ayarları sayfasını aç ve izleyiciler sekmesini seç
+                                    handleDeviceSettings(device, true);
+                                    // Seçili izleyiciyi düzenleme için ayarla
+                                    setSelectedMonitorType(monitor.type as any);
                                   }}
                                 >
                                   {/* Aç/Kapat switch'i sağ üst köşede */}
