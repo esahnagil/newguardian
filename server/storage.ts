@@ -578,7 +578,7 @@ export class DatabaseStorage implements IStorage {
     return await db
       .select()
       .from(monitors)
-      .where(eq(monitors.device_id, deviceId));
+      .where(eq(monitors.deviceId, deviceId));
   }
   
   async getMonitor(id: number): Promise<Monitor | undefined> {
@@ -595,8 +595,8 @@ export class DatabaseStorage implements IStorage {
       .insert(monitors)
       .values({
         ...insertMonitor,
-        created_at: now,
-        updated_at: now
+        createdAt: now,
+        updatedAt: now
       })
       .returning();
     return monitor;
@@ -607,7 +607,7 @@ export class DatabaseStorage implements IStorage {
       .update(monitors)
       .set({
         ...partialMonitor,
-        updated_at: new Date()
+        updatedAt: new Date()
       })
       .where(eq(monitors.id, id))
       .returning();
@@ -618,7 +618,7 @@ export class DatabaseStorage implements IStorage {
     // Delete all results for this monitor
     await db
       .delete(monitorResults)
-      .where(eq(monitorResults.monitor_id, id));
+      .where(eq(monitorResults.monitorId, id));
     
     const result = await db
       .delete(monitors)
@@ -633,7 +633,7 @@ export class DatabaseStorage implements IStorage {
     const [result] = await db
       .select()
       .from(monitorResults)
-      .where(eq(monitorResults.monitor_id, monitorId))
+      .where(eq(monitorResults.monitorId, monitorId))
       .orderBy(desc(monitorResults.timestamp))
       .limit(1);
       
@@ -644,7 +644,7 @@ export class DatabaseStorage implements IStorage {
     return await db
       .select()
       .from(monitorResults)
-      .where(eq(monitorResults.monitor_id, monitorId))
+      .where(eq(monitorResults.monitorId, monitorId))
       .orderBy(desc(monitorResults.timestamp))
       .limit(limit);
   }
@@ -658,9 +658,9 @@ export class DatabaseStorage implements IStorage {
     const [result] = await db
       .insert(monitorResults)
       .values({
-        monitor_id: monitorId,
+        monitorId: monitorId,
         status,
-        response_time: responseTime || null,
+        responseTime: responseTime || null,
         details: details || {},
         timestamp: new Date()
       })
@@ -689,7 +689,7 @@ export class DatabaseStorage implements IStorage {
     return await db
       .select()
       .from(alerts)
-      .where(eq(alerts.device_id, deviceId))
+      .where(eq(alerts.deviceId, deviceId))
       .orderBy(desc(alerts.timestamp));
   }
   
@@ -718,11 +718,11 @@ export class DatabaseStorage implements IStorage {
     const alertUpdate: any = { status };
     
     if (status === 'acknowledged') {
-      alertUpdate.acknowledged_at = now;
+      alertUpdate.acknowledgedAt = now;
     }
     
     if (status === 'resolved') {
-      alertUpdate.resolved_at = now;
+      alertUpdate.resolvedAt = now;
     }
     
     const [updatedAlert] = await db

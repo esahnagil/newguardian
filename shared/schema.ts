@@ -9,58 +9,58 @@ export const users = pgTable("users", {
   id: serial("id").primaryKey(),
   username: text("username").notNull().unique(),
   password: text("password").notNull(),
-  fullName: text("full_name"),
+  fullName: text("fullName"),
   email: text("email"),
   role: text("role").notNull().default("viewer").$type<(typeof userRoleEnum)[number]>(),
-  isActive: boolean("is_active").notNull().default(true),
-  lastLoginAt: timestamp("last_login_at"),
+  isActive: boolean("isActive").notNull().default(true),
+  lastLoginAt: timestamp("lastLoginAt"),
   preferences: json("preferences"),
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow(),
-  createdBy: integer("created_by"), // Kullanıcıyı oluşturan kullanıcının ID'si
+  createdAt: timestamp("createdAt").defaultNow(),
+  updatedAt: timestamp("updatedAt").defaultNow(),
+  createdBy: integer("createdBy"), // Kullanıcıyı oluşturan kullanıcının ID'si
 });
 
 export const devices = pgTable("devices", {
   id: serial("id").primaryKey(),
   name: text("name").notNull(),
-  ip_address: text("ip_address").notNull(),
+  ipAddress: text("ipAddress").notNull(),
   type: text("type").notNull(), // router, switch, server, etc.
   location: text("location"), // Cihazın fiziksel konumu
-  maintenance_mode: boolean("maintenance_mode").default(false), // Bakım durumu
-  created_at: timestamp("created_at").defaultNow(),
-  updated_at: timestamp("updated_at").defaultNow(),
+  maintenanceMode: boolean("maintenanceMode").default(false), // Bakım durumu
+  createdAt: timestamp("createdAt").defaultNow(),
+  updatedAt: timestamp("updatedAt").defaultNow(),
 });
 
 export const monitors = pgTable("monitors", {
   id: serial("id").primaryKey(),
-  device_id: integer("device_id").notNull(),
+  deviceId: integer("deviceId").notNull(),
   type: text("type").notNull(), // icmp, snmp, http, tcp
   config: json("config").notNull(), // configuration for the specific monitor
   enabled: boolean("enabled").notNull().default(true),
   interval: integer("interval").notNull().default(60), // seconds
-  created_at: timestamp("created_at").defaultNow(),
-  updated_at: timestamp("updated_at").defaultNow(),
+  createdAt: timestamp("createdAt").defaultNow(),
+  updatedAt: timestamp("updatedAt").defaultNow(),
 });
 
-export const monitorResults = pgTable("monitor_results", {
+export const monitorResults = pgTable("monitorResults", {
   id: serial("id").primaryKey(),
-  monitor_id: integer("monitor_id").notNull(),
+  monitorId: integer("monitorId").notNull(),
   timestamp: timestamp("timestamp").defaultNow(),
   status: text("status").notNull(), // online, warning, down
-  response_time: integer("response_time"), // milliseconds
+  responseTime: integer("responseTime"), // milliseconds
   details: json("details"), // additional details about the check
 });
 
 export const alerts = pgTable("alerts", {
   id: serial("id").primaryKey(),
-  device_id: integer("device_id").notNull(),
-  monitor_id: integer("monitor_id").notNull(),
+  deviceId: integer("deviceId").notNull(),
+  monitorId: integer("monitorId").notNull(),
   message: text("message").notNull(),
   severity: text("severity").notNull(), // info, warning, danger
   status: text("status").notNull().default("active"), // active, acknowledged, escalated, resolved
   timestamp: timestamp("timestamp").defaultNow(),
-  acknowledged_at: timestamp("acknowledged_at"),
-  resolved_at: timestamp("resolved_at"),
+  acknowledgedAt: timestamp("acknowledgedAt"),
+  resolvedAt: timestamp("resolvedAt"),
 });
 
 export const insertUserSchema = createInsertSchema(users);
@@ -70,20 +70,20 @@ export const updateUserSchema = createInsertSchema(users).partial();
 export const userPreferencesSchema = z.object({
   theme: z.enum(['light', 'dark', 'system']).default('system'),
   language: z.enum(['tr', 'en']).default('tr'),
-  email_notifications: z.boolean().default(true),
-  dashboard_layout: z.record(z.string(), z.any()).optional(),
+  emailNotifications: z.boolean().default(true),
+  dashboardLayout: z.record(z.string(), z.any()).optional(),
 });
 
 export const insertDeviceSchema = createInsertSchema(devices).pick({
   name: true,
-  ip_address: true,
+  ipAddress: true,
   type: true,
   location: true,
-  maintenance_mode: true,
+  maintenanceMode: true,
 });
 
 export const insertMonitorSchema = createInsertSchema(monitors).pick({
-  device_id: true,
+  deviceId: true,
   type: true,
   config: true,
   enabled: true,
@@ -91,8 +91,8 @@ export const insertMonitorSchema = createInsertSchema(monitors).pick({
 });
 
 export const insertAlertSchema = createInsertSchema(alerts).pick({
-  device_id: true,
-  monitor_id: true,
+  deviceId: true,
+  monitorId: true,
   message: true,
   severity: true,
   status: true,
@@ -101,7 +101,7 @@ export const insertAlertSchema = createInsertSchema(alerts).pick({
 // Protocol-specific configurations
 export const icmpConfigSchema = z.object({
   timeout: z.number().min(1).default(5), // seconds
-  packet_size: z.number().min(1).default(56), // bytes
+  packetSize: z.number().min(1).default(56), // bytes
   count: z.number().min(1).default(3), // number of packets to send
 });
 
@@ -117,9 +117,9 @@ export const httpConfigSchema = z.object({
   method: z.enum(["GET", "POST", "PUT", "DELETE"]).default("GET"),
   headers: z.record(z.string()).optional(),
   body: z.string().optional(),
-  expected_status: z.number().min(100).max(599).default(200),
+  expectedStatus: z.number().min(100).max(599).default(200),
   timeout: z.number().min(1).default(5), // seconds
-  validate_ssl: z.boolean().default(true),
+  validateSsl: z.boolean().default(true),
 });
 
 export const tcpConfigSchema = z.object({

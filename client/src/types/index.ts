@@ -1,44 +1,44 @@
 export interface Device {
   id: number;
   name: string;
-  ip_address: string;
+  ipAddress: string;
   type: string;
   location?: string;
-  maintenance_mode?: boolean;
-  created_at: string;
-  updated_at: string;
+  maintenanceMode?: boolean;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface Monitor {
   id: number;
-  device_id: number;
+  deviceId: number;
   type: string;
   config: any;
   enabled: boolean;
   interval: number;
-  created_at: string;
-  updated_at: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface MonitorResult {
   id: number;
-  monitor_id: number;
+  monitorId: number;
   timestamp: string;
   status: string;
-  response_time?: number;
+  responseTime?: number;
   details?: any;
 }
 
 export interface Alert {
   id: number;
-  device_id: number;
-  monitor_id: number;
+  deviceId: number;
+  monitorId: number;
   message: string;
   severity: 'info' | 'warning' | 'danger';
   status: 'active' | 'acknowledged' | 'resolved';
   timestamp: string;
-  acknowledged_at?: string;
-  resolved_at?: string;
+  acknowledgedAt?: string;
+  resolvedAt?: string;
 }
 
 export interface DashboardSummary {
@@ -47,27 +47,25 @@ export interface DashboardSummary {
     online: number;
     percentage: number;
   };
-  web_services: {
+  webServices: {
     total: number;
     online: number;
     percentage: number;
   };
-  active_alerts: number;
-  average_response_time: number;
+  activeAlerts: number;
+  averageResponseTime: number;
 }
 
 export interface DeviceWithStatus extends Device {
   status?: string;
-  response_time?: number;
-  responseTime?: number; // Field used by real-time websocket updates
-  last_check?: string;
-  lastCheck?: string;  // Field used by real-time websocket updates
+  responseTime?: number; // Used for both API and real-time websocket updates
+  lastCheck?: string;  // Used for both API and real-time websocket updates
 }
 
 export interface DeviceWithMonitors extends Device {
   monitors?: Monitor[];
-  total_monitors?: number;
-  active_monitors?: number;
+  totalMonitors?: number;
+  activeMonitors?: number;
   status?: 'online' | 'offline' | 'warning' | 'unknown';
 }
 
