@@ -1594,7 +1594,7 @@ const Monitoring = () => {
                             <span>{device.name}</span>
                           </div>
                         </TableCell>
-                        <TableCell>{device.ipAddress}</TableCell>
+                        <TableCell>{device.ipAddress || device.ip_address}</TableCell>
                         <TableCell>
                           <div className="flex items-center space-x-2">
                             <div className="bg-green-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-medium">
