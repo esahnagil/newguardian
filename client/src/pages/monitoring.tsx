@@ -466,10 +466,13 @@ const Monitoring = () => {
         enabled: transformedData.enabled,
         interval: transformedData.interval
       };
-      console.log("API payload:", payload);
       
       // PayLoad'u doğrudan göndermek yerine, method ve URL ile birlikte gönderiyoruz
-      return await apiRequest('POST', '/api/monitors', payload);
+      return await apiRequest('POST', '/api/monitors', { 
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/monitors'] });
@@ -507,7 +510,11 @@ const Monitoring = () => {
   // İzleyici durumunu değiştirme işlemi
   const toggleMonitorMutation = useMutation({
     mutationFn: async ({ id, enabled }: { id: number; enabled: boolean }) => {
-      return await apiRequest('PUT', `/api/monitors/${id}`, { body: { enabled } });
+      return await apiRequest('PUT', `/api/monitors/${id}`, { 
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ enabled }) 
+      });
     },
     onSuccess: (data, variables) => {
       // Otomatik olarak sorguyu yenileme - bu durum değişikliğini önlüyor
