@@ -943,7 +943,9 @@ const Monitoring = () => {
     mutationFn: async (values: Partial<Device>) => {
       if (!selectedDevice?.id) throw new Error("Cihaz ID gereklidir");
       return await apiRequest('PUT', `/api/devices/${selectedDevice.id}`, { 
-        body: values 
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(values)
       });
     },
     onSuccess: () => {
@@ -982,7 +984,9 @@ const Monitoring = () => {
       if (!values.id) throw new Error("Monitor ID is required");
       const transformedData = transformFormData(values);
       return await apiRequest('PUT', `/api/monitors/${values.id}`, { 
-        body: transformedData
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(transformedData)
       });
     },
     onSuccess: () => {
