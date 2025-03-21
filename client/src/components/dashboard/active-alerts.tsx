@@ -28,7 +28,7 @@ const ActiveAlerts = () => {
 
   if (isLoading) {
     return (
-      <div className="bg-white rounded-lg shadow-sm flex flex-col h-[600px]">
+      <div className="bg-white rounded-lg shadow-sm flex flex-col h-[635px]">
         <div className="p-4 border-b">
           <div className="flex items-center justify-between">
             <h3 className="font-semibold">Aktif Uyarılar</h3>
@@ -72,7 +72,7 @@ const ActiveAlerts = () => {
   }
 
   return (
-    <div className="bg-white rounded-lg shadow-sm flex flex-col h-[600px]">
+    <div className="bg-white rounded-lg shadow-sm flex flex-col h-[635px]">
       <div className="p-4 border-b">
         <div className="flex items-center justify-between">
           <h3 className="font-semibold">Aktif Uyarılar</h3>
@@ -105,7 +105,7 @@ const ActiveAlerts = () => {
                 <div>
                   <h4 className="text-sm font-medium">{alert.message}</h4>
                   <p className="text-xs text-gray-500">
-                    Uyarı ID: {alert.id} - Cihaz ID: {alert.deviceId}
+                    Uyarı ID: {alert.id} - Cihaz ID: {alert.device_id}
                   </p>
                 </div>
                 <span className="text-xs text-gray-500">
