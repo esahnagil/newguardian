@@ -1168,7 +1168,7 @@ const Monitoring = () => {
                     </div>
                     <div className="space-y-1.5">
                       <h3 className="text-sm font-medium text-gray-700">Ekleme Tarihi</h3>
-                      <p>{new Date(selectedDevice?.createdAt || '').toLocaleDateString()}</p>
+                      <p>{new Date(selectedDevice?.created_at || '').toLocaleDateString()}</p>
                     </div>
                   </div>
 
@@ -1180,7 +1180,7 @@ const Monitoring = () => {
                     <div className="space-y-1.5">
                       <h3 className="text-sm font-medium text-gray-700">Bakım Durumu</h3>
                       <p>
-                        {selectedDevice?.maintenanceMode ? (
+                        {selectedDevice?.maintenance_mode ? (
                           <Badge className="bg-yellow-500">Bakımda</Badge>
                         ) : (
                           <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">Aktif</Badge>
@@ -1208,7 +1208,7 @@ const Monitoring = () => {
                       <h3 className="text-sm font-medium text-gray-700">IP Adresi</h3>
                       <Input
                         placeholder="IP adresi"
-                        defaultValue={selectedDevice?.ipAddress}
+                        defaultValue={selectedDevice?.ip_address}
                       />
                     </div>
                   </div>
@@ -1250,7 +1250,7 @@ const Monitoring = () => {
                         </p>
                       </div>
                       <Switch
-                        checked={selectedDevice?.maintenanceMode || false}
+                        checked={selectedDevice?.maintenance_mode || false}
                       />
                     </div>
                   </div>
@@ -1284,7 +1284,7 @@ const Monitoring = () => {
                       size="sm" 
                       onClick={() => {
                         if (selectedDevice) {
-                          form.setValue("deviceId", selectedDevice.id);
+                          form.setValue("device_id", selectedDevice.id);
                           setIsAddMonitorOpen(true);
                         }
                       }}
@@ -1627,7 +1627,7 @@ const Monitoring = () => {
               <TableBody>
                 {devices.map((device) => {
                   // Cihaza ait tüm izleyicileri bul
-                  const deviceMonitors = monitors?.filter(m => m.deviceId === device.id) || [];
+                  const deviceMonitors = monitors?.filter(m => m.device_id === device.id) || [];
                   const totalMonitors = deviceMonitors.length;
                   const activeMonitors = deviceMonitors.filter(m => m.enabled).length;
                   const isExpanded = expandedDeviceId === device.id;
@@ -1688,10 +1688,10 @@ const Monitoring = () => {
                             <span>{device.name}</span>
                           </div>
                         </TableCell>
-                        <TableCell>{device.ipAddress || device.ip_address}</TableCell>
+                        <TableCell>{device.ip_address}</TableCell>
                         <TableCell>{device.location || '-'}</TableCell>
                         <TableCell>
-                          {device.maintenanceMode ? (
+                          {device.maintenance_mode ? (
                             <Badge variant="warning" className="bg-yellow-500">Bakımda</Badge>
                           ) : (
                             <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">Aktif</Badge>
