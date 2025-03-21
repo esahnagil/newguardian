@@ -111,7 +111,7 @@ const StatusBadge = ({ status }: { status: string }) => {
 
 const DeviceList = () => {
   const [page, setPage] = useState(1);
-  const [perPage] = useState(5);
+  const [perPage] = useState(10); // Sayfada gösterilen cihaz sayısını 5'ten 10'a çıkardık
 
   const { data: devices, isLoading: isLoadingDevices, refetch: refetchDevices } = useQuery<Device[]>({
     queryKey: ['/api/devices'],
@@ -265,7 +265,7 @@ const DeviceList = () => {
                       <DeviceIcon type={device.type} />
                       <div className="ml-2">
                         <div className="text-sm font-medium">{device.name}</div>
-                        <div className="text-xs text-gray-500">{device.ipAddress}</div>
+                        <div className="text-xs text-gray-500">{device.ip_address}</div>
                       </div>
                     </div>
                   </div>
