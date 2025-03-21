@@ -75,7 +75,7 @@ type MonitorType = 'icmp' | 'snmp' | 'http' | 'tcp';
 
 // Base monitor schema
 const baseMonitorSchema = z.object({
-  deviceId: z.coerce.number().min(1, { message: "Please select a device" }),
+  device_id: z.coerce.number().min(1, { message: "Please select a device" }),
   type: z.string().min(1, { message: "Please select a monitor type" }),
   enabled: z.boolean().default(true),
   interval: z.coerce.number().min(10, { message: "Interval must be at least 10 seconds" }).default(60)
@@ -142,10 +142,6 @@ type MonitorFormValues = z.infer<typeof monitorSchema> & {
 const transformFormData = (data: any): any => {
   // Önce veriyi kopyalayalım
   const transformed = { ...data };
-  
-  // İsim eşleştirmelerini yapalım (frontend'de camelCase, backend'de snake_case)
-  transformed.device_id = transformed.deviceId;
-  delete transformed.deviceId;
   
   // Transform headers string to object for HTTP monitors
   if (transformed.type === 'http' && transformed.config.headers) {
@@ -458,9 +454,9 @@ const Monitoring = () => {
   const createMonitorMutation = useMutation({
     mutationFn: async (values: MonitorFormValues) => {
       const transformedData = transformFormData(values);
-      // deviceId -> device_id dönüşümünü yaparak API ile uyumlu hale getiriyoruz
+      // Uyumlu payload oluştur
       const payload = {
-        device_id: transformedData.deviceId || transformedData.device_id,
+        device_id: transformedData.device_id,
         type: transformedData.type,
         config: transformedData.config,
         enabled: transformedData.enabled,

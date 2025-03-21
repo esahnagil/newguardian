@@ -1,44 +1,44 @@
 export interface Device {
   id: number;
   name: string;
-  ipAddress: string;
+  ip_address: string;
   type: string;
   location?: string;
-  maintenanceMode?: boolean;
-  createdAt: string;
-  updatedAt: string;
+  maintenance_mode?: boolean;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface Monitor {
   id: number;
-  deviceId: number;
+  device_id: number;
   type: string;
   config: any;
   enabled: boolean;
   interval: number;
-  createdAt: string;
-  updatedAt: string;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface MonitorResult {
   id: number;
-  monitorId: number;
+  monitor_id: number;
   timestamp: string;
   status: string;
-  responseTime?: number;
+  response_time?: number;
   details?: any;
 }
 
 export interface Alert {
   id: number;
-  deviceId: number;
-  monitorId: number;
+  device_id: number;
+  monitor_id: number;
   message: string;
   severity: 'info' | 'warning' | 'danger';
   status: 'active' | 'acknowledged' | 'resolved';
   timestamp: string;
-  acknowledgedAt?: string;
-  resolvedAt?: string;
+  acknowledged_at?: string;
+  resolved_at?: string;
 }
 
 export interface DashboardSummary {
@@ -47,25 +47,25 @@ export interface DashboardSummary {
     online: number;
     percentage: number;
   };
-  webServices: {
+  web_services: {
     total: number;
     online: number;
     percentage: number;
   };
-  activeAlerts: number;
-  averageResponseTime: number;
+  active_alerts: number;
+  average_response_time: number;
 }
 
 export interface DeviceWithStatus extends Device {
   status?: string;
-  responseTime?: number;
-  lastCheck?: string;
+  response_time?: number;
+  last_check?: string;
 }
 
 export interface DeviceWithMonitors extends Device {
   monitors?: Monitor[];
-  totalMonitors?: number;
-  activeMonitors?: number;
+  total_monitors?: number;
+  active_monitors?: number;
   status?: 'online' | 'offline' | 'warning' | 'unknown';
 }
 
