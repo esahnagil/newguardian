@@ -19,7 +19,7 @@ function Router() {
   return (
     <Switch>
       <Route path="/" component={Dashboard} />
-      <Route path="/monitoring">{Monitoring}</Route>
+      <Route path="/monitoring" component={Monitoring} />
       <Route path="/alerts" component={Alerts} />
       <Route path="/users" component={Users} />
       <Route path="/settings" component={Settings} />

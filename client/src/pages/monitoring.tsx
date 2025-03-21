@@ -1537,7 +1537,7 @@ const Monitoring = () => {
                   }
 
                   return (
-                    <React.Fragment key={device.id.toString()}>
+                    <div key={device.id.toString()}>
                       {/* Ana cihaz satırı */}
                       <TableRow
                         className={cn(
@@ -1667,7 +1667,7 @@ const Monitoring = () => {
                           </TableCell>
                         </TableRow>
                       )}
-                    </React.Fragment>
+                    </div>
                   );
                 })}
               </TableBody>
