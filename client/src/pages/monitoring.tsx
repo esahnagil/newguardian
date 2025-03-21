@@ -1547,7 +1547,7 @@ const Monitoring = () => {
                   }
 
                   return (
-                    <div key={device.id.toString()}>
+                    <React.Fragment key={device.id.toString()}>
                       {/* Ana cihaz satırı */}
                       <TableRow
                         className={cn(
@@ -1556,7 +1556,7 @@ const Monitoring = () => {
                         )}
                         onClick={() => toggleDeviceExpanded(device.id)}
                       >
-                        <TableCell>
+                        <TableCell className="w-[40px]">
                           <div className={`transform transition-transform ${isExpanded ? 'rotate-90' : ''}`}>
                             <svg
                               xmlns="http://www.w3.org/2000/svg"
@@ -1574,7 +1574,7 @@ const Monitoring = () => {
                             </svg>
                           </div>
                         </TableCell>
-                        <TableCell className="font-medium">
+                        <TableCell className="font-medium w-[200px]">
                           <div className="flex items-center space-x-2">
                             {/* Cihaz türüne göre ikon göster */}
                             <svg
@@ -1627,8 +1627,7 @@ const Monitoring = () => {
                       {/* Genişletilmiş cihaz izleyicileri - Kart şeklinde */}
                       {isExpanded && (
                         <TableRow key={`${device.id}-monitors`} className="bg-gray-50 animate-fadeIn">
-                          <TableCell></TableCell>
-                          <TableCell colSpan={4} className="p-4">
+                          <TableCell colSpan={5} className="p-4">
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 animate-slideDown">
                               {deviceMonitors.map(monitor => (
                                 <div
@@ -1677,7 +1676,7 @@ const Monitoring = () => {
                           </TableCell>
                         </TableRow>
                       )}
-                    </div>
+                    </React.Fragment>
                   );
                 })}
               </TableBody>
