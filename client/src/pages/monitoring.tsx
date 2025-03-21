@@ -139,23 +139,30 @@ type MonitorFormValues = z.infer<typeof monitorSchema> & {
 };
 
 // Helper for transforming form data
-const transformFormData = (data: any): MonitorFormValues => {
+const transformFormData = (data: any): any => {
+  // Önce veriyi kopyalayalım
+  const transformed = { ...data };
+  
+  // İsim eşleştirmelerini yapalım (frontend'de camelCase, backend'de snake_case)
+  transformed.device_id = transformed.deviceId;
+  delete transformed.deviceId;
+  
   // Transform headers string to object for HTTP monitors
-  if (data.type === 'http' && data.config.headers) {
+  if (transformed.type === 'http' && transformed.config.headers) {
     try {
-      const headersObj = JSON.parse(data.config.headers);
-      data.config.headers = headersObj;
+      const headersObj = JSON.parse(transformed.config.headers);
+      transformed.config.headers = headersObj;
     } catch (e) {
       // If parsing fails, leave as string and let backend handle it
     }
   }
 
   // Handle SNMP OIDs
-  if (data.type === 'snmp' && typeof data.config.oids === 'string') {
-    data.config.oids = data.config.oids.split('\n').map((oid: string) => oid.trim()).filter(Boolean);
+  if (transformed.type === 'snmp' && typeof transformed.config.oids === 'string') {
+    transformed.config.oids = transformed.config.oids.split('\n').map((oid: string) => oid.trim()).filter(Boolean);
   }
 
-  return data;
+  return transformed;
 };
 
 const MonitorTypeIcon = ({ type }: { type: string }) => {
@@ -447,8 +454,8 @@ const Monitoring = () => {
   const createMonitorMutation = useMutation({
     mutationFn: async (values: MonitorFormValues) => {
       const transformedData = transformFormData(values);
-      // API istekleri için doğru formatta veri göndermek için body nesnesini direkt olarak geçelim
-      return await apiRequest('POST', '/api/monitors', { body: transformedData });
+      // API istekleri için doğru formatta veri göndermek için JSON formatında body
+      return await apiRequest('POST', '/api/monitors', transformedData);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/monitors'] });
