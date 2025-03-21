@@ -3,6 +3,8 @@ export interface Device {
   name: string;
   ipAddress: string;
   type: string;
+  location?: string;
+  maintenanceMode?: boolean;
   createdAt: string;
   updatedAt: string;
 }

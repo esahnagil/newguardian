@@ -271,7 +271,9 @@ const Monitoring = () => {
   const deviceSchema = z.object({
     name: z.string().min(1, "Cihaz adı girilmelidir"),
     ipAddress: z.string().ip("Geçerli bir IP adresi girin"),
-    type: z.string().min(1, "Cihaz türü seçilmelidir")
+    type: z.string().min(1, "Cihaz türü seçilmelidir"),
+    location: z.string().optional(),
+    maintenanceMode: z.boolean().default(false)
   });
   
   // Cihaz tipi için form değişkeni
@@ -283,7 +285,9 @@ const Monitoring = () => {
     defaultValues: {
       name: '',
       ipAddress: '',
-      type: 'server'
+      type: 'server',
+      location: '',
+      maintenanceMode: false
     }
   });
 

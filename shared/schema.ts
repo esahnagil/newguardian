@@ -25,6 +25,8 @@ export const devices = pgTable("devices", {
   name: text("name").notNull(),
   ip_address: text("ip_address").notNull(),
   type: text("type").notNull(), // router, switch, server, etc.
+  location: text("location"), // Cihazın fiziksel konumu
+  maintenance_mode: boolean("maintenance_mode").default(false), // Bakım durumu
   created_at: timestamp("created_at").defaultNow(),
   updated_at: timestamp("updated_at").defaultNow(),
 });
@@ -76,6 +78,8 @@ export const insertDeviceSchema = createInsertSchema(devices).pick({
   name: true,
   ip_address: true,
   type: true,
+  location: true,
+  maintenance_mode: true,
 });
 
 export const insertMonitorSchema = createInsertSchema(monitors).pick({
