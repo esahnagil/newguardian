@@ -7,6 +7,27 @@ async function throwIfResNotOk(res: Response) {
   }
 }
 
+// Yardımcı fonksiyon: snake_case -> camelCase dönüşümü
+function toCamelCase(obj: any): any {
+  if (obj === null || typeof obj !== 'object') {
+    return obj;
+  }
+
+  if (Array.isArray(obj)) {
+    return obj.map(item => toCamelCase(item));
+  }
+
+  return Object.keys(obj).reduce((acc, key) => {
+    // snake_case anahtarı camelCase'e dönüştür
+    const camelKey = key.replace(/_([a-z])/g, (_, letter) => letter.toUpperCase());
+    
+    // Değer bir nesne ise, özyinelemeli olarak dönüştür
+    acc[camelKey] = toCamelCase(obj[key]);
+    
+    return acc;
+  }, {} as Record<string, any>);
+}
+
 export async function apiRequest<T = any>(
   method: string,
   url: string,
@@ -33,7 +54,9 @@ export async function apiRequest<T = any>(
     if (method === 'DELETE' || url.includes('/status')) {
       return {} as T; // Empty response for operations without content
     }
-    return await res.json();
+    // API yanıtını al ve camelCase'e dönüştür
+    const jsonData = await res.json();
+    return toCamelCase(jsonData) as T;
   } catch (e) {
     console.error("Error parsing JSON response:", e);
     return {} as T;
@@ -55,7 +78,9 @@ export const getQueryFn: <T>(options: {
     }
 
     await throwIfResNotOk(res);
-    return await res.json();
+    // API yanıtını al ve camelCase'e dönüştür
+    const jsonData = await res.json();
+    return toCamelCase(jsonData);
   };
 
 export const queryClient = new QueryClient({
