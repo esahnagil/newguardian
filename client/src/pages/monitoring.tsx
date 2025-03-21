@@ -454,8 +454,15 @@ const Monitoring = () => {
   const createMonitorMutation = useMutation({
     mutationFn: async (values: MonitorFormValues) => {
       const transformedData = transformFormData(values);
-      // API istekleri için doğru formatta veri göndermek için JSON formatında body
-      return await apiRequest('POST', '/api/monitors', transformedData);
+      // deviceId -> device_id dönüşümünü yaparak API ile uyumlu hale getiriyoruz
+      const payload = {
+        device_id: transformedData.deviceId || transformedData.device_id,
+        type: transformedData.type,
+        config: transformedData.config,
+        enabled: transformedData.enabled,
+        interval: transformedData.interval
+      };
+      return await apiRequest('POST', '/api/monitors', payload);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/monitors'] });

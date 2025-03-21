@@ -18,12 +18,12 @@ import { Menu } from "lucide-react";
 function Router() {
   return (
     <Switch>
-      <Route path="/" component={Dashboard} />
-      <Route path="/monitoring" component={Monitoring} />
-      <Route path="/alerts" component={Alerts} />
-      <Route path="/users" component={Users} />
-      <Route path="/settings" component={Settings} />
-      <Route component={NotFound} />
+      <Route path="/"><Dashboard /></Route>
+      <Route path="/monitoring"><Monitoring /></Route>
+      <Route path="/alerts"><Alerts /></Route>
+      <Route path="/users"><Users /></Route>
+      <Route path="/settings"><Settings /></Route>
+      <Route><NotFound /></Route>
     </Switch>
   );
 }
