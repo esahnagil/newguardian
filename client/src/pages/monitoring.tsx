@@ -464,9 +464,8 @@ const Monitoring = () => {
       };
       console.log("API payload:", payload);
       
-      // API isteği için payload'u doğrudan gönderiyoruz.
-      // apiRequest içerisinde JSON.stringify işlemi yapılacak
-      return await apiRequest('POST', '/api/monitors', { body: payload });
+      // PayLoad'u doğrudan göndermek yerine, method ve URL ile birlikte gönderiyoruz
+      return await apiRequest('POST', '/api/monitors', payload);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/monitors'] });
