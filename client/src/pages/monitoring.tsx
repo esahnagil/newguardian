@@ -256,7 +256,12 @@ const Monitoring = () => {
   const [isDeviceSheetOpen, setIsDeviceSheetOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("info");
   const [isAddDeviceOpen, setIsAddDeviceOpen] = useState(false); // Added state for Add Device dialog
-  const [deviceUpdatedValues, setDeviceUpdatedValues] = useState<Partial<Device>>({});
+  const [deviceUpdatedValues, setDeviceUpdatedValues] = useState<Partial<Device>>({}); 
+  
+  // Bakım modu değişikliğini izlemek için
+  useEffect(() => {
+    console.log('Güncel form verileri:', deviceUpdatedValues);
+  }, [deviceUpdatedValues]);
 
   // Fetch devices
   const { data: devices } = useQuery<Device[]>({
@@ -1305,8 +1310,11 @@ const Monitoring = () => {
                         </p>
                       </div>
                       <Switch
-                        checked={selectedDevice?.maintenance_mode || false}
-                        onCheckedChange={(checked) => setDeviceUpdatedValues({...deviceUpdatedValues, maintenance_mode: checked})}
+                        checked={deviceUpdatedValues.maintenance_mode !== undefined ? deviceUpdatedValues.maintenance_mode : (selectedDevice?.maintenance_mode || false)}
+                        onCheckedChange={(checked) => {
+                          console.log("Switch değeri değişti:", checked);
+                          setDeviceUpdatedValues({...deviceUpdatedValues, maintenance_mode: checked});
+                        }}
                       />
                     </div>
                   </div>
