@@ -969,7 +969,7 @@ const Monitoring = () => {
   const resetMonitorForm = (monitor: Monitor) => {
     form.reset({
       id: monitor.id,
-      deviceId: monitor.deviceId,
+      device_id: monitor.device_id,
       type: monitor.type as any,
       enabled: monitor.enabled,
       interval: monitor.interval,
@@ -1043,7 +1043,7 @@ const Monitoring = () => {
                     )}                  />
                   <FormField
                     control={deviceForm.control}
-                    name="ipAddress"
+                    name="ip_address"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>IP Adresi</FormLabel>
@@ -1096,7 +1096,7 @@ const Monitoring = () => {
                   />
                   <FormField
                     control={deviceForm.control}
-                    name="maintenanceMode"
+                    name="maintenance_mode"
                     render={({ field }) => (
                       <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
                         <div className="space-y-0.5">
@@ -1136,7 +1136,7 @@ const Monitoring = () => {
           <SheetHeader>
             <SheetTitle>Cihaz Ayarları</SheetTitle>
             <SheetDescription>
-              {selectedDevice?.name} ({selectedDevice?.ipAddress})
+              {selectedDevice?.name} ({selectedDevice?.ip_address})
             </SheetDescription>
           </SheetHeader>
 
@@ -1157,7 +1157,7 @@ const Monitoring = () => {
                     </div>
                     <div className="space-y-1.5">
                       <h3 className="text-sm font-medium text-gray-700">IP Adresi</h3>
-                      <p>{selectedDevice?.ipAddress}</p>
+                      <p>{selectedDevice?.ip_address}</p>
                     </div>
                   </div>
 
