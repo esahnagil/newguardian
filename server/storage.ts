@@ -99,6 +99,20 @@ export class MemStorage implements IStorage {
       { name: "Amazon AWS", ipAddress: "176.32.103.205", type: "server" }
     ];
     
+    // Tüm eski verileri temizleyelim
+    this.users.clear();
+    this.devices.clear();
+    this.monitors.clear();
+    this.monitorResults.clear();
+    this.alerts.clear();
+    
+    // ID'leri sıfırlayalım
+    this.currentUserId = 1;
+    this.currentDeviceId = 1;
+    this.currentMonitorId = 1;
+    this.currentResultId = 1;
+    this.currentAlertId = 1;
+    
     sampleDevices.forEach(device => this.createDevice(device));
     
     // Add ICMP monitors for each device
@@ -721,7 +735,5 @@ export class DatabaseStorage implements IStorage {
   }
 }
 
-// Initialize the storage implementation based on database connection
-export const storage = process.env.DATABASE_URL 
-  ? new DatabaseStorage() 
-  : new MemStorage();
+// Artık daima veritabanını kullanıyoruz
+export const storage = new DatabaseStorage();

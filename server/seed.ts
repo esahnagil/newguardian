@@ -7,34 +7,62 @@ import { storage, MemStorage } from "./storage";
 import { PostgresJsDatabase } from "drizzle-orm/postgres-js";
 
 /**
- * Check if required tables exist in the database
+ * Check if tables exist and if any data exists in the devices table
  */
-async function checkTablesExist() {
+async function shouldSeedDatabase() {
   try {
-    // PostgreSQL veritabanında doğrudan sorgu yaparak tabloları kontrol et
-    const query = `
+    // İlk olarak tabloların varlığını kontrol et
+    const tablesQuery = `
       SELECT COUNT(*) as count FROM information_schema.tables 
       WHERE table_name IN ('devices', 'monitors', 'monitor_results', 'alerts')
       AND table_schema = 'public';
     `;
     
+    // Sonra cihazlar tablosunda veri olup olmadığını kontrol et
+    const deviceDataQuery = `
+      SELECT COUNT(*) as count FROM devices;
+    `;
+    
     // Doğrudan veritabanına sorgu gönder
     if (process.env.DATABASE_URL) {
-      // Eğer kullanılan bir şey (Drizzle db) çalışmıyorsa, client'ı doğrudan kullan
+      // Veritabanı bağlantısını oluştur
       const postgres = await import('postgres');
       const sql = postgres.default(process.env.DATABASE_URL);
-      const result = await sql.unsafe(query);
       
-      if (result && result.length > 0) {
-        const count = parseInt(result[0].count);
-        await sql.end();
-        return count >= 4;
+      // Tabloların varlığını kontrol et
+      const tablesResult = await sql.unsafe(tablesQuery);
+      
+      if (tablesResult && tablesResult.length > 0) {
+        const tablesCount = parseInt(tablesResult[0].count);
+        
+        // Eğer tüm tablolar mevcutsa, cihazlar tablosunda veri var mı kontrol et
+        if (tablesCount >= 4) {
+          try {
+            const deviceDataResult = await sql.unsafe(deviceDataQuery);
+            if (deviceDataResult && deviceDataResult.length > 0) {
+              const deviceCount = parseInt(deviceDataResult[0].count);
+              await sql.end();
+              
+              // Hiç cihaz verisi yoksa seed işlemi yap
+              return deviceCount === 0;
+            }
+          } catch (error) {
+            // Tablo var ama sorgu çalışmadıysa, muhtemelen tablonun yapısı doğru değil
+            console.error("Error checking device data:", error);
+            await sql.end();
+            return true; // Seed işlemi yap
+          }
+        } else {
+          // Tüm tablolar mevcut değilse seed işlemi yapma
+          await sql.end();
+          return false;
+        }
       }
       await sql.end();
     }
-    return false;
+    return false; // Varsayılan olarak seed işlemi yapma
   } catch (error) {
-    console.error("Error checking tables:", error);
+    console.error("Error checking database:", error);
     return false;
   }
 }
@@ -43,43 +71,36 @@ async function checkTablesExist() {
  * Seed the database with initial data
  */
 export async function seedDatabase() {
-  // Skip seeding if using MemStorage - it's already initialized with sample data
-  if (storage instanceof MemStorage) {
-    console.log("Using MemStorage, skipping database seeding");
-    return;
-  }
+  // Artık her zaman veritabanını kullanıyoruz
+  console.log("Veritabanı seeding işlemi başlatılıyor...");
 
   try {
-    // Check if tables exist
-    const tablesExist = await checkTablesExist();
-    if (!tablesExist) {
-      console.log("Required tables do not exist, skipping seed operation");
+    // Check if we need to seed the database
+    const shouldSeed = await shouldSeedDatabase();
+    if (!shouldSeed) {
+      console.log("Database already has data, skipping seed operation");
       return;
     }
 
-    // Check if database is already seeded
-    const existingDevices = await db.select().from(schema.devices);
-    if (existingDevices.length > 0) {
-      console.log("Database already seeded, skipping seed operation");
-      return;
-    }
+    // Veritabanı boş olduğu için seed işlemi yapacağız
+    console.log("Veritabanı boş, seed işlemi başlatılıyor...");
 
     console.log("Seeding database with initial data...");
 
-    // Add sample devices
+    // Add sample devices with real world IPs
     const sampleDevices: InsertDevice[] = [
-      { name: "Core Router", ip_address: "192.168.1.1", type: "router" },
-      { name: "Main Switch", ip_address: "192.168.1.2", type: "switch" },
-      { name: "Distribution Switch", ip_address: "192.168.1.3", type: "switch" },
-      { name: "Web Server", ip_address: "192.168.1.100", type: "server" },
-      { name: "Database Server", ip_address: "192.168.1.101", type: "server" },
-      { name: "Mail Server", ip_address: "192.168.1.102", type: "server" },
-      { name: "Backup Server", ip_address: "192.168.1.103", type: "server" },
-      { name: "AP Office 1", ip_address: "192.168.1.150", type: "access_point" },
-      { name: "AP Office 2", ip_address: "192.168.1.151", type: "access_point" },
-      { name: "AP Meeting Room", ip_address: "192.168.1.152", type: "access_point" },
-      { name: "Firewall", ip_address: "192.168.1.254", type: "firewall" },
-      { name: "NAS Storage", ip_address: "192.168.1.200", type: "storage" }
+      { name: "Google DNS", ip_address: "8.8.8.8", type: "server" },
+      { name: "Cloudflare DNS", ip_address: "1.1.1.1", type: "server" },
+      { name: "Quad9 DNS", ip_address: "9.9.9.9", type: "server" },
+      { name: "OpenDNS", ip_address: "208.67.222.222", type: "server" },
+      { name: "Amazon AWS", ip_address: "52.94.236.248", type: "server" },
+      { name: "Microsoft Azure", ip_address: "20.36.32.15", type: "server" },
+      { name: "Google Cloud", ip_address: "35.190.27.215", type: "server" },
+      { name: "Cloudflare", ip_address: "104.16.132.229", type: "server" },
+      { name: "GitHub", ip_address: "140.82.121.4", type: "server" },
+      { name: "YouTube", ip_address: "142.250.185.78", type: "server" },
+      { name: "Facebook", ip_address: "157.240.3.35", type: "server" },
+      { name: "Twitter", ip_address: "104.244.42.65", type: "server" }
     ];
 
     // Insert devices and get their IDs
@@ -140,85 +161,85 @@ export async function seedDatabase() {
 
     // Add HTTP monitors for web and mail servers
     try {
-      // Web Server HTTP monitor
-      const httpWebMonitor: InsertMonitor = {
-        device_id: 4, // Web Server
+      // Google HTTP monitor
+      const httpGoogleMonitor: InsertMonitor = {
+        device_id: deviceIds[0], // Google DNS (ilk cihaz)
         type: "http",
         config: { 
-          url: "http://192.168.1.100", 
+          url: "https://www.google.com", 
           method: "GET", 
           expected_status: 200, 
           timeout: 5,
-          validate_ssl: false
+          validate_ssl: true
         },
         enabled: true,
         interval: 60
       };
 
-      const [httpWebResult] = await db
+      const [httpGoogleResult] = await db
         .insert(monitors)
         .values({
-          ...httpWebMonitor,
+          ...httpGoogleMonitor,
           created_at: new Date(),
           updated_at: new Date()
         })
         .returning();
         
-      // Mail Server HTTP monitor
-      const httpMailMonitor: InsertMonitor = {
-        device_id: 6, // Mail Server
+      // Cloudflare HTTP monitor
+      const httpCloudflareMonitor: InsertMonitor = {
+        device_id: deviceIds[1], // Cloudflare DNS (ikinci cihaz)
         type: "http",
         config: { 
-          url: "http://192.168.1.102/webmail", 
+          url: "https://www.cloudflare.com", 
           method: "GET", 
           expected_status: 200, 
           timeout: 5,
-          validate_ssl: false
+          validate_ssl: true
         },
         enabled: true,
         interval: 60
       };
 
-      const [httpMailResult] = await db
+      const [httpCloudflareResult] = await db
         .insert(monitors)
         .values({
-          ...httpMailMonitor,
+          ...httpCloudflareMonitor,
           created_at: new Date(),
           updated_at: new Date()
         })
         .returning();
 
-      // Add TCP monitors for database and mail servers
-      const tcpDBMonitor: InsertMonitor = {
-        device_id: 5, // Database Server
+      // Add TCP monitors for major services
+      const tcpGoogleMonitor: InsertMonitor = {
+        device_id: deviceIds[0], // Google DNS (ilk cihaz)
         type: "tcp",
-        config: { port: 5432, timeout: 5 },
+        config: { port: 53, timeout: 5 },
         enabled: true,
         interval: 60
       };
 
-      const [tcpDBResult] = await db
+      const [tcpGoogleResult] = await db
         .insert(monitors)
         .values({
-          ...tcpDBMonitor,
+          ...tcpGoogleMonitor,
           created_at: new Date(),
           updated_at: new Date()
         })
         .returning();
         
-      // Mail Server SMTP TCP monitor
-      const tcpMailMonitor: InsertMonitor = {
-        device_id: 6, // Mail Server
+      // GitHub SSH TCP monitor
+      const tcpGitHubMonitor: InsertMonitor = {
+        device_id: deviceIds.length >= 9 ? deviceIds[8] : deviceIds[0], // GitHub veya Google DNS
         type: "tcp",
-        config: { port: 25, timeout: 5 },
+        config: { port: 22, timeout: 5 },
         enabled: true,
         interval: 60
       };
 
-      const [tcpMailResult] = await db
+      const [tcpGitHubResult] = await db
         .insert(monitors)
         .values({
-          ...tcpMailMonitor,
+          ...tcpGitHubMonitor,
           created_at: new Date(),
           updated_at: new Date()
         })
@@ -227,37 +248,37 @@ export async function seedDatabase() {
       // Add some alerts
       const alertData: InsertAlert[] = [
         {
-          device_id: 4,
-          monitor_id: httpWebResult.id,
-          message: "Web Server Offline",
+          device_id: deviceIds[0], // Google DNS
+          monitor_id: httpGoogleResult.id,
+          message: "Google Service Offline",
           severity: "danger",
           status: "active"
         },
         {
-          device_id: 5,
-          monitor_id: tcpDBResult.id,
-          message: "High CPU Usage",
+          device_id: deviceIds[1], // Cloudflare DNS
+          monitor_id: httpCloudflareResult.id,
+          message: "Cloudflare Connection Issue",
           severity: "warning",
           status: "active"
         },
         {
-          device_id: 6,
-          monitor_id: httpMailResult.id,
-          message: "Mail Server HTTP Error",
+          device_id: deviceIds[0], // Google DNS
+          monitor_id: tcpGoogleResult.id,
+          message: "Google DNS Error",
           severity: "danger",
           status: "active"
         },
         {
-          device_id: 6,
-          monitor_id: tcpMailResult.id,
-          message: "Mail Server SMTP Error",
+          device_id: deviceIds.length >= 9 ? deviceIds[8] : deviceIds[0], // GitHub veya Google DNS
+          monitor_id: tcpGitHubResult.id,
+          message: "GitHub SSH Connection Error",
           severity: "warning",
           status: "active"
         },
         {
-          device_id: 8,
-          monitor_id: 8, // ICMP monitor for AP
-          message: "AP Response Time",
+          device_id: deviceIds[2], // Quad9 DNS
+          monitor_id: deviceIds.length >= 3 ? deviceIds[2] : deviceIds[0], // İlgili cihazın monitör ID'si
+          message: "Quad9 DNS Response Delay",
           severity: "warning",
           status: "active"
         }
