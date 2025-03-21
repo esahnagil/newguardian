@@ -1171,7 +1171,16 @@ const Monitoring = () => {
       </div>
 
       {/* Cihaz Ayarları Sheet */}
-      <Sheet open={isDeviceSheetOpen} onOpenChange={setIsDeviceSheetOpen}>
+      <Sheet 
+        open={isDeviceSheetOpen} 
+        onOpenChange={(open) => {
+          setIsDeviceSheetOpen(open);
+          if (!open) {
+            // Reset form values when sheet closes
+            setDeviceUpdatedValues({});
+          }
+        }}
+      >
         <SheetContent className="sm:max-w-lg overflow-y-auto">
           <SheetHeader>
             <SheetTitle>Cihaz Ayarları</SheetTitle>
@@ -1250,6 +1259,7 @@ const Monitoring = () => {
                       <Input
                         placeholder="IP adresi"
                         defaultValue={selectedDevice?.ip_address}
+                        onChange={(e) => setDeviceUpdatedValues({...deviceUpdatedValues, ip_address: e.target.value})}
                       />
                     </div>
                   </div>
@@ -1257,7 +1267,10 @@ const Monitoring = () => {
                   <div className="grid grid-cols-1 gap-3">
                     <div className="space-y-1.5">
                       <h3 className="text-sm font-medium text-gray-700">Cihaz Türü</h3>
-                      <Select defaultValue={selectedDevice?.type}>
+                      <Select
+                        defaultValue={selectedDevice?.type}
+                        onValueChange={(value) => setDeviceUpdatedValues({...deviceUpdatedValues, type: value})}
+                      >
                         <SelectTrigger>
                           <SelectValue placeholder="Cihaz türü seçin" />
                         </SelectTrigger>
@@ -1278,6 +1291,7 @@ const Monitoring = () => {
                       <Input
                         placeholder="Cihazın fiziksel konumu"
                         defaultValue={selectedDevice?.location || ''}
+                        onChange={(e) => setDeviceUpdatedValues({...deviceUpdatedValues, location: e.target.value})}
                       />
                     </div>
                   </div>
@@ -1292,6 +1306,7 @@ const Monitoring = () => {
                       </div>
                       <Switch
                         checked={selectedDevice?.maintenance_mode || false}
+                        onCheckedChange={(checked) => setDeviceUpdatedValues({...deviceUpdatedValues, maintenance_mode: checked})}
                       />
                     </div>
                   </div>
@@ -1304,14 +1319,10 @@ const Monitoring = () => {
                       İptal
                     </Button>
                     <Button
-                      onClick={() => {
-                        toast({
-                          title: "Bilgilendirme",
-                          description: "Bu özellik henüz geliştirme aşamasındadır.",
-                        });
-                      }}
+                      onClick={handleUpdateDevice}
+                      disabled={updateDeviceMutation.isPending}
                     >
-                      Değişiklikleri Kaydet
+                      {updateDeviceMutation.isPending ? "Kaydediliyor..." : "Değişiklikleri Kaydet"}
                     </Button>
                   </div>
                 </div>
