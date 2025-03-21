@@ -971,14 +971,16 @@ const Monitoring = () => {
   const handleUpdateDevice = () => {
     if (!selectedDevice) return;
     
-    const formData: Partial<Device> = {
-      name: deviceUpdatedValues.name !== undefined ? deviceUpdatedValues.name : selectedDevice.name,
-      ip_address: deviceUpdatedValues.ip_address !== undefined ? deviceUpdatedValues.ip_address : selectedDevice.ip_address,
-      type: deviceUpdatedValues.type !== undefined ? deviceUpdatedValues.type : selectedDevice.type,
-      location: deviceUpdatedValues.location !== undefined ? deviceUpdatedValues.location : selectedDevice.location,
-      maintenance_mode: deviceUpdatedValues.maintenance_mode !== undefined ? deviceUpdatedValues.maintenance_mode : selectedDevice.maintenance_mode
-    };
+    // Sadece değişen değerleri gönder
+    const formData: Partial<Device> = {};
     
+    if (deviceUpdatedValues.name !== undefined) formData.name = deviceUpdatedValues.name;
+    if (deviceUpdatedValues.ip_address !== undefined) formData.ip_address = deviceUpdatedValues.ip_address;
+    if (deviceUpdatedValues.type !== undefined) formData.type = deviceUpdatedValues.type;
+    if (deviceUpdatedValues.location !== undefined) formData.location = deviceUpdatedValues.location;
+    if (deviceUpdatedValues.maintenance_mode !== undefined) formData.maintenance_mode = deviceUpdatedValues.maintenance_mode;
+    
+    console.log("Gönderilecek veriler:", formData);
     updateDeviceMutation.mutate(formData);
   };
 
