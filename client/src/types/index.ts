@@ -59,7 +59,9 @@ export interface DashboardSummary {
 export interface DeviceWithStatus extends Device {
   status?: string;
   response_time?: number;
+  responseTime?: number; // Field used by real-time websocket updates
   last_check?: string;
+  lastCheck?: string;  // Field used by real-time websocket updates
 }
 
 export interface DeviceWithMonitors extends Device {

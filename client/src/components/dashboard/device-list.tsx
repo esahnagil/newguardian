@@ -123,7 +123,18 @@ const DeviceList = () => {
 
   // Get latest status for each device
   const devicesWithStatus = devices?.map(device => {
-    const deviceMonitors = monitors?.filter(monitor => monitor.deviceId === device.id) || [];
+    // If device already has status from WebSocket updates, use that
+    if (device.status && (device.responseTime || device.response_time)) {
+      return {
+        ...device,
+        // Ensure we use the correct property names
+        status: device.status,
+        responseTime: device.responseTime || device.response_time,
+        lastCheck: device.lastCheck || device.last_check
+      } as DeviceWithStatus;
+    }
+    
+    const deviceMonitors = monitors?.filter(monitor => monitor.device_id === device.id) || [];
 
     // Default values
     let worstStatus = 'unknown';
@@ -146,9 +157,9 @@ const DeviceList = () => {
           worstStatus = monitorResult.status;
         }
 
-        // Capture response time from any ICMP monitor
-        if (monitor.type === 'icmp' && monitorResult.responseTime) {
-          responseTime = monitorResult.responseTime;
+        // Capture response time from any monitor
+        if (monitorResult.response_time || monitorResult.responseTime) {
+          responseTime = monitorResult.response_time || monitorResult.responseTime;
         }
 
         // Update last check time if newer
