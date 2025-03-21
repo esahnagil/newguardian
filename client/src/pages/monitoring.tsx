@@ -1666,6 +1666,186 @@ const Monitoring = () => /* data-replit-metadata is auto-added here, but causes 
           )}
         </div>
       </div>
+
+      {/* İzleyici Ekleme Diyaloğu */}
+      <Dialog open={isAddMonitorOpen} onOpenChange={setIsAddMonitorOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Yeni İzleyici Ekle</DialogTitle>
+            <DialogDescription>
+              {selectedDevice ? `"${selectedDevice.name}" cihazı için yeni bir izleyici ekleyin.` : 'Yeni bir izleyici ekleyin.'}
+            </DialogDescription>
+          </DialogHeader>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              <FormField
+                control={form.control}
+                name="type"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>İzleyici Tipi</FormLabel>
+                    <Select onValueChange={(value) => {
+                      field.onChange(value);
+                      setSelectedMonitorType(value as "icmp" | "snmp" | "http" | "tcp");
+                    }} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="İzleyici türü seçin" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="icmp">ICMP (Ping)</SelectItem>
+                        <SelectItem value="http">HTTP</SelectItem>
+                        <SelectItem value="tcp">TCP Port</SelectItem>
+                        <SelectItem value="snmp">SNMP</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="enabled"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
+                    <div className="space-y-0.5">
+                      <FormLabel>Etkin</FormLabel>
+                      <FormDescription>
+                        İzleyiciyi oluşturulduğunda etkinleştir
+                      </FormDescription>
+                    </div>
+                    <FormControl>
+                      <Switch
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="interval"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Kontrol Aralığı (saniye)</FormLabel>
+                    <FormControl>
+                      <Input type="number" min="10" {...field} />
+                    </FormControl>
+                    <FormDescription>
+                      İzleyicinin ne sıklıkla kontrol yapacağı
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {selectedMonitorType === 'http' && (
+                <>
+                  <FormField
+                    control={form.control}
+                    name="config.url"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>URL</FormLabel>
+                        <FormControl>
+                          <Input placeholder="https://example.com" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="config.method"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>HTTP Metodu</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="HTTP metodu seçin" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="GET">GET</SelectItem>
+                            <SelectItem value="POST">POST</SelectItem>
+                            <SelectItem value="PUT">PUT</SelectItem>
+                            <SelectItem value="DELETE">DELETE</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="config.timeout"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Zaman Aşımı (saniye)</FormLabel>
+                        <FormControl>
+                          <Input type="number" min="1" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </>
+              )}
+
+              {selectedMonitorType === 'tcp' && (
+                <>
+                  <FormField
+                    control={form.control}
+                    name="config.port"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Port Numarası</FormLabel>
+                        <FormControl>
+                          <Input type="number" min="1" max="65535" {...field} />
+                        </FormControl>
+                        <FormDescription>
+                          İzlenecek TCP portu (örneğin, HTTP için 80, SSH için 22)
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="config.timeout"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Zaman Aşımı (saniye)</FormLabel>
+                        <FormControl>
+                          <Input type="number" min="1" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </>
+              )}
+
+              <DialogFooter>
+                <Button variant="outline" onClick={() => setIsAddMonitorOpen(false)}>
+                  İptal
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={createMonitorMutation.isPending}
+                >
+                  {createMonitorMutation.isPending ? "Ekleniyor..." : "İzleyici Ekle"}
+                </Button>
+              </DialogFooter>
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
     </main>
   );
 };
