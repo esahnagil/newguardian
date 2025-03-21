@@ -256,6 +256,7 @@ const Monitoring = () => {
   const [isDeviceSheetOpen, setIsDeviceSheetOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("info");
   const [isAddDeviceOpen, setIsAddDeviceOpen] = useState(false); // Added state for Add Device dialog
+  const [deviceUpdatedValues, setDeviceUpdatedValues] = useState<Partial<Device>>({});
 
   // Fetch devices
   const { data: devices } = useQuery<Device[]>({
@@ -937,6 +938,45 @@ const Monitoring = () => {
     createDeviceMutation.mutate(values);
   };
 
+  // Cihaz güncelleme işlemi
+  const updateDeviceMutation = useMutation({
+    mutationFn: async (values: Partial<Device>) => {
+      if (!selectedDevice?.id) throw new Error("Cihaz ID gereklidir");
+      return await apiRequest('PUT', `/api/devices/${selectedDevice.id}`, { 
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(values) 
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/devices'] });
+      toast({ title: 'Cihaz Güncellendi', description: 'Cihaz bilgileri başarıyla güncellendi.' });
+      setIsDeviceSheetOpen(false);
+    },
+    onError: (error) => {
+      toast({
+        title: 'Hata',
+        description: `Cihaz güncellenemedi: ${error instanceof Error ? error.message : 'Bilinmeyen hata'}`,
+        variant: 'destructive'
+      });
+    }
+  });
+
+  // Cihaz ayarlarını güncelle
+  const handleUpdateDevice = () => {
+    if (!selectedDevice) return;
+    
+    const formData: Partial<Device> = {
+      name: deviceUpdatedValues.name !== undefined ? deviceUpdatedValues.name : selectedDevice.name,
+      ip_address: deviceUpdatedValues.ip_address !== undefined ? deviceUpdatedValues.ip_address : selectedDevice.ip_address,
+      type: deviceUpdatedValues.type !== undefined ? deviceUpdatedValues.type : selectedDevice.type,
+      location: deviceUpdatedValues.location !== undefined ? deviceUpdatedValues.location : selectedDevice.location,
+      maintenance_mode: deviceUpdatedValues.maintenance_mode !== undefined ? deviceUpdatedValues.maintenance_mode : selectedDevice.maintenance_mode
+    };
+    
+    updateDeviceMutation.mutate(formData);
+  };
+
 
   // Update monitor mutation
   const updateMonitorMutation = useMutation({
@@ -1144,7 +1184,7 @@ const Monitoring = () => {
             <Tabs defaultValue={activeTab} className="w-full">
               <TabsList className="grid w-full grid-cols-3 mb-4">
                 <TabsTrigger value="info">Bilgiler</TabsTrigger>
-                <TabsTrigger value="settings">Ayarlar</TabsTrigger>
+                <TabsTrigger value="settings">Yapılandırma</TabsTrigger>
                 <TabsTrigger value="monitors">İzleyiciler</TabsTrigger>
               </TabsList>
 
@@ -1199,6 +1239,7 @@ const Monitoring = () => {
                       <Input
                         placeholder="Cihaz adı"
                         defaultValue={selectedDevice?.name}
+                        onChange={(e) => setDeviceUpdatedValues({...deviceUpdatedValues, name: e.target.value})}
                       />
                     </div>
                   </div>
