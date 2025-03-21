@@ -947,11 +947,20 @@ const Monitoring = () => {
   const updateDeviceMutation = useMutation({
     mutationFn: async (values: Partial<Device>) => {
       if (!selectedDevice?.id) throw new Error("Cihaz ID gereklidir");
-      return await apiRequest('PUT', `/api/devices/${selectedDevice.id}`, { 
+      // Tüm verileri gönder
+      const response = await fetch(`/api/devices/${selectedDevice.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(values)
       });
+      
+      if (!response.ok) {
+        const text = await response.text();
+        console.error("Hata yanıtı:", text);
+        throw new Error(`${response.status}: ${text || response.statusText}`);
+      }
+      
+      return await response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/devices'] });
@@ -990,11 +999,21 @@ const Monitoring = () => {
     mutationFn: async (values: MonitorFormValues) => {
       if (!values.id) throw new Error("Monitor ID is required");
       const transformedData = transformFormData(values);
-      return await apiRequest('PUT', `/api/monitors/${values.id}`, { 
+      
+      // Direkt fetch kullan
+      const response = await fetch(`/api/monitors/${values.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(transformedData)
       });
+      
+      if (!response.ok) {
+        const text = await response.text();
+        console.error("Hata yanıtı:", text);
+        throw new Error(`${response.status}: ${text || response.statusText}`);
+      }
+      
+      return await response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/monitors'] });
