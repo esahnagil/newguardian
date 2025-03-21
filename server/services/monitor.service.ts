@@ -105,12 +105,14 @@ export class MonitorService {
           status = icmpResult.status;
           responseTime = icmpResult.responseTime;
           details = icmpResult.details;
+          console.log(`[Monitor] ICMP check for ${device.name} (${device.ip_address}): ${status}, response time: ${responseTime}ms`);
           break;
         
         case 'snmp':
           const snmpResult = await this.checkSNMP(device, monitor.config as SNMPConfig);
           status = snmpResult.status;
           details = snmpResult.details;
+          console.log(`[Monitor] SNMP check for ${device.name} (${device.ip_address}): ${status}`);
           break;
         
         case 'http':
@@ -118,6 +120,7 @@ export class MonitorService {
           status = httpResult.status;
           responseTime = httpResult.responseTime;
           details = httpResult.details;
+          console.log(`[Monitor] HTTP check for ${(monitor.config as HTTPConfig).url}: ${status}, response time: ${responseTime}ms`);
           break;
         
         case 'tcp':
@@ -125,11 +128,13 @@ export class MonitorService {
           status = tcpResult.status;
           responseTime = tcpResult.responseTime;
           details = tcpResult.details;
+          console.log(`[Monitor] TCP check for ${device.name}:${(monitor.config as TCPConfig).port}: ${status}, response time: ${responseTime}ms`);
           break;
         
         default:
           status = 'unknown';
           details = { error: `Unknown monitor type: ${monitor.type}` };
+          console.log(`[Monitor] Unknown monitor type for ${device.name}: ${monitor.type}`);
       }
       
       // Store the monitor result
@@ -142,12 +147,15 @@ export class MonitorService {
       
       // Get the previous result to check for status changes
       const previousResults = await this.storage.getMonitorResults(monitor.id, 2);
-      const previousResult = previousResults.length > 1 ? previousResults[0] : null;
+      const previousResult = previousResults.length > 1 ? previousResults[1] : null;
       
       // If status changed to 'down' or 'warning', create an alert
-      if (status !== 'online' && (!previousResult || previousResult.status === 'online')) {
+      if ((status === 'down' || status === 'warning') && 
+          (!previousResult || previousResult.status === 'online' || previousResult.status === 'unknown')) {
         const severity = status === 'down' ? 'danger' : 'warning';
         const message = this.generateAlertMessage(device, monitor, status);
+        
+        console.log(`[Monitor] Creating alert for ${device.name}: ${message} (${severity})`);
         
         const alert = await this.storage.createAlert({
           device_id: device.id,
@@ -160,6 +168,15 @@ export class MonitorService {
         // Notify listeners about the new alert
         this.notifyListeners('alert', alert);
       }
+      
+      // Emit a device status update to all clients
+      this.notifyListeners('deviceStatus', {
+        id: device.id,
+        name: device.name,
+        status: status,
+        last_check: new Date().toISOString(),
+        response_time: responseTime
+      });
       
       // Notify listeners about the updated monitor result
       this.notifyListeners('monitorResult', {
