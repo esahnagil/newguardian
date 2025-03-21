@@ -1167,6 +1167,20 @@ const Monitoring = () => /* data-replit-metadata is auto-added here, but causes 
 
               <TabsContent value="monitors" className="space-y-6">
                 <div className="space-y-4">
+                  <div className="flex justify-between items-center">
+                    <h3 className="text-sm font-medium text-gray-700">İzleyiciler</h3>
+                    <Button 
+                      size="sm" 
+                      onClick={() => {
+                        if (selectedDevice) {
+                          form.setValue("deviceId", selectedDevice.id);
+                          setIsAddMonitorOpen(true);
+                        }
+                      }}
+                    >
+                      İzleyici Ekle
+                    </Button>
+                  </div>
                   {selectedDevice && monitorsByDevice[selectedDevice.id]?.map((monitor) => (
                     <Accordion
                       key={monitor.id}
