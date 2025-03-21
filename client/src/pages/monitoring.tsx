@@ -910,7 +910,11 @@ const Monitoring = () => {
   
   const createDeviceMutation = useMutation({
     mutationFn: async (data: DeviceFormValues) => {
-      return await apiRequest('POST', '/api/devices', { body: data });
+      return await apiRequest('POST', '/api/devices', { 
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/devices'] });
@@ -936,7 +940,11 @@ const Monitoring = () => {
     mutationFn: async (values: MonitorFormValues) => {
       if (!values.id) throw new Error("Monitor ID is required");
       const transformedData = transformFormData(values);
-      return await apiRequest('PUT', `/api/monitors/${values.id}`, { body: JSON.stringify(transformedData) });
+      return await apiRequest('PUT', `/api/monitors/${values.id}`, { 
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(transformedData) 
+      });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/monitors'] });
@@ -1067,6 +1075,42 @@ const Monitoring = () => {
                       </FormItem>
                     )}
                   />
+                  <FormField
+                    control={deviceForm.control}
+                    name="location"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Konum</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Örn: Veri Merkezi - Kat 3" {...field} />
+                        </FormControl>
+                        <FormDescription>
+                          Cihazın fiziksel konumu (isteğe bağlı)
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={deviceForm.control}
+                    name="maintenanceMode"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
+                        <div className="space-y-0.5">
+                          <FormLabel>Bakım Modu</FormLabel>
+                          <FormDescription>
+                            Cihaz bakım modunda mı?
+                          </FormDescription>
+                        </div>
+                        <FormControl>
+                          <Switch
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                          />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
                   <DialogFooter>
                     <Button
                       type="submit"
@@ -1124,6 +1168,23 @@ const Monitoring = () => {
                       <p>{new Date(selectedDevice?.createdAt || '').toLocaleDateString()}</p>
                     </div>
                   </div>
+
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="space-y-1.5">
+                      <h3 className="text-sm font-medium text-gray-700">Konum</h3>
+                      <p>{selectedDevice?.location || '-'}</p>
+                    </div>
+                    <div className="space-y-1.5">
+                      <h3 className="text-sm font-medium text-gray-700">Bakım Durumu</h3>
+                      <p>
+                        {selectedDevice?.maintenanceMode ? (
+                          <Badge className="bg-yellow-500">Bakımda</Badge>
+                        ) : (
+                          <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">Aktif</Badge>
+                        )}
+                      </p>
+                    </div>
+                  </div>
                 </div>
               </TabsContent>
 
@@ -1164,6 +1225,30 @@ const Monitoring = () => {
                           ))}
                         </SelectContent>
                       </Select>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 gap-3">
+                    <div className="space-y-1.5">
+                      <h3 className="text-sm font-medium text-gray-700">Konum</h3>
+                      <Input
+                        placeholder="Cihazın fiziksel konumu"
+                        defaultValue={selectedDevice?.location || ''}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 gap-3">
+                    <div className="space-y-1.5 flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
+                      <div>
+                        <h3 className="text-sm font-medium text-gray-700">Bakım Modu</h3>
+                        <p className="text-sm text-gray-500">
+                          Cihaz bakım modunda olduğunda, uyarılar bastırılır
+                        </p>
+                      </div>
+                      <Switch
+                        checked={selectedDevice?.maintenanceMode || false}
+                      />
                     </div>
                   </div>
 
