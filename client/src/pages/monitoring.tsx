@@ -266,10 +266,10 @@ const Monitoring = () => {
   // Cihaz schema tanımı
   const deviceSchema = z.object({
     name: z.string().min(1, "Cihaz adı girilmelidir"),
-    ipAddress: z.string().ip("Geçerli bir IP adresi girin"),
+    ip_address: z.string().ip("Geçerli bir IP adresi girin"),
     type: z.string().min(1, "Cihaz türü seçilmelidir"),
     location: z.string().optional(),
-    maintenanceMode: z.boolean().default(false)
+    maintenance_mode: z.boolean().default(false)
   });
   
   // Cihaz tipi için form değişkeni
@@ -280,10 +280,10 @@ const Monitoring = () => {
     resolver: zodResolver(deviceSchema),
     defaultValues: {
       name: '',
-      ipAddress: '',
+      ip_address: '',
       type: 'server',
       location: '',
-      maintenanceMode: false
+      maintenance_mode: false
     }
   });
 
@@ -872,7 +872,7 @@ const Monitoring = () => {
 
   // Group monitors by device
   const monitorsByDevice = monitors?.reduce((acc, monitor) => {
-    const deviceId = monitor.deviceId;
+    const deviceId = monitor.device_id;
     if (!acc[deviceId]) {
       acc[deviceId] = [];
     }
