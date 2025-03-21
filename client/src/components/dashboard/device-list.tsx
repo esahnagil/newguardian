@@ -111,7 +111,7 @@ const StatusBadge = ({ status }: { status: string }) => {
 
 const DeviceList = () => {
   const [page, setPage] = useState(1);
-  const [perPage] = useState(10); // Sayfada gösterilen cihaz sayısını 5'ten 10'a çıkardık
+  const [perPage] = useState(7); // Sayfada gösterilen cihaz sayısını 7'ye ayarladık
 
   const { data: devices, isLoading: isLoadingDevices, refetch: refetchDevices } = useQuery<Device[]>({
     queryKey: ['/api/devices'],
@@ -192,7 +192,7 @@ const DeviceList = () => {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-sm lg:col-span-2 flex flex-col h-[600px]">
+    <div className="bg-white rounded-lg shadow-sm lg:col-span-2 flex flex-col h-[635px]">
       <div className="p-4 border-b">
         <div className="flex items-center justify-between">
           <h3 className="font-semibold">İzlenen Cihazlar</h3>
@@ -232,7 +232,7 @@ const DeviceList = () => {
             </div>
           </div>
 
-          {/* Scrollable Content */}
+          {/* Scrollable Content - Cihaz satır yüksekliğine göre ayarlandı */}
           <div className="overflow-y-auto" style={{ height: "calc(100% - 40px)" }}>
             {isLoading ? (
               Array(perPage).fill(0).map((_, idx) => (
