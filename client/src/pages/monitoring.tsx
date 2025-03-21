@@ -1530,6 +1530,8 @@ const Monitoring = () => {
                   <TableHead className="w-[40px]"></TableHead>
                   <TableHead className="w-[200px]">Cihaz</TableHead>
                   <TableHead>IP Adresi</TableHead>
+                  <TableHead>Konum</TableHead>
+                  <TableHead>Bakım Durumu</TableHead>
                   <TableHead>İzleyici Durumu</TableHead>
                   <TableHead className="text-right">İşlemler</TableHead>
                 </TableRow>
@@ -1599,6 +1601,14 @@ const Monitoring = () => {
                           </div>
                         </TableCell>
                         <TableCell>{device.ipAddress || device.ip_address}</TableCell>
+                        <TableCell>{device.location || '-'}</TableCell>
+                        <TableCell>
+                          {device.maintenanceMode ? (
+                            <Badge variant="warning" className="bg-yellow-500">Bakımda</Badge>
+                          ) : (
+                            <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">Aktif</Badge>
+                          )}
+                        </TableCell>
                         <TableCell>
                           <div className="flex items-center space-x-2">
                             <div className="bg-green-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-medium">
@@ -1631,7 +1641,7 @@ const Monitoring = () => {
                       {/* Genişletilmiş cihaz izleyicileri - Kart şeklinde */}
                       {isExpanded && (
                         <TableRow key={`${device.id}-monitors`} className="bg-gray-50 animate-fadeIn">
-                          <TableCell colSpan={5} className="p-4">
+                          <TableCell colSpan={7} className="p-4">
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 animate-slideDown">
                               {deviceMonitors.map(monitor => (
                                 <div
@@ -1675,7 +1685,7 @@ const Monitoring = () => {
                       {/* Eğer cihazın izleyicisi yoksa ve genişletilmişse bilgi mesajı göster */}
                       {isExpanded && deviceMonitors.length === 0 && (
                         <TableRow className="bg-gray-50 animate-fadeIn">
-                          <TableCell colSpan={5} className="text-center py-4">
+                          <TableCell colSpan={7} className="text-center py-4">
                             <p className="text-gray-500">Bu cihaz için henüz izleyici bulunmuyor.</p>
                           </TableCell>
                         </TableRow>
