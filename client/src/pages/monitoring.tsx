@@ -1692,7 +1692,7 @@ const Monitoring = () => {
                         <TableCell>{device.location || '-'}</TableCell>
                         <TableCell>
                           {device.maintenance_mode ? (
-                            <Badge variant="warning" className="bg-yellow-500">Bakımda</Badge>
+                            <Badge variant="outline" className="bg-yellow-500 text-yellow-700 border-yellow-200">Bakımda</Badge>
                           ) : (
                             <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">Aktif</Badge>
                           )}
