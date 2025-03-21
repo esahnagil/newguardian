@@ -244,7 +244,8 @@ const MonitorTypeIcon = ({ type }: { type: string }) => {
   );
 };
 
-const Monitoring = () => /* data-replit-metadata is auto-added here, but causes warnings */ {
+// Not: data-replit-metadata otomatik olarak ekleniyor, ancak uyarılara neden oluyor
+const Monitoring = () => {
   const { toast } = useToast();
   const [isAddMonitorOpen, setIsAddMonitorOpen] = useState(false);
   const [selectedMonitorType, setSelectedMonitorType] = useState<"icmp" | "snmp" | "http" | "tcp" | null>(null);
@@ -446,7 +447,8 @@ const Monitoring = () => /* data-replit-metadata is auto-added here, but causes 
   const createMonitorMutation = useMutation({
     mutationFn: async (values: MonitorFormValues) => {
       const transformedData = transformFormData(values);
-      return await apiRequest('POST', '/api/monitors', { body: JSON.stringify(transformedData) });
+      // API istekleri için doğru formatta veri göndermek için body nesnesini direkt olarak geçelim
+      return await apiRequest('POST', '/api/monitors', { body: transformedData });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/monitors'] });
