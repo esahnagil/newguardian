@@ -53,9 +53,9 @@ export class MonitorService {
     this.running = false;
     
     // Clear all intervals
-    for (const intervalId of this.checkIntervals.values()) {
+    this.checkIntervals.forEach((intervalId) => {
       clearInterval(intervalId);
-    }
+    });
     
     this.checkIntervals.clear();
     console.log('Monitoring service stopped');
@@ -409,6 +409,13 @@ export class MonitorService {
    */
   registerEventListener(listener: EventListener) {
     this.eventListeners.push(listener);
+  }
+  
+  /**
+   * Remove a specific event listener
+   */
+  removeEventListener(listener: EventListener) {
+    this.eventListeners = this.eventListeners.filter(l => l !== listener);
   }
   
   /**

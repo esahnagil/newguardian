@@ -552,15 +552,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
       ws.send(JSON.stringify({ type: 'alerts', data: alerts }));
     });
 
+    // Create a unique event listener for this connection
+    const eventListener = (event: string, data: any) => {
+      try {
+        ws.send(JSON.stringify({ type: event, data }));
+        console.log(`Sent WebSocket event: ${event}`);
+      } catch (error) {
+        console.error('Error sending WebSocket data:', error);
+      }
+    };
+
     // Monitor for new alerts or status changes
-    monitorService.registerEventListener((event, data) => {
-      ws.send(JSON.stringify({ type: event, data }));
-    });
+    monitorService.registerEventListener(eventListener);
 
     ws.on('close', () => {
       console.log('Client disconnected');
-      // Clean up event listeners
-      monitorService.removeEventListeners();
+      // Clean up only this event listener
+      monitorService.removeEventListener(eventListener);
     });
   });
 
