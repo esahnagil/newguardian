@@ -162,36 +162,36 @@ async function seedDatabase() {
     // Add some alerts
     const alertsData = [
       {
-        device_id: deviceIds[3], // Microsoft Azure
-        monitor_id: httpAzureMonitor[0].id,
+        deviceId: deviceIds[3], // Microsoft Azure
+        monitorId: httpAzureMonitor[0].id,
         message: "Microsoft Azure HTTP Error",
         severity: "danger",
         status: "active"
       },
       {
-        device_id: deviceIds[4], // Alibaba Cloud
-        monitor_id: tcpAlibabaMonitor[0].id,
+        deviceId: deviceIds[4], // Alibaba Cloud
+        monitorId: tcpAlibabaMonitor[0].id,
         message: "Alibaba Cloud High Latency",
         severity: "warning",
         status: "active"
       },
       {
-        device_id: deviceIds[5], // Facebook
-        monitor_id: httpFacebookMonitor[0].id,
+        deviceId: deviceIds[5], // Facebook
+        monitorId: httpFacebookMonitor[0].id,
         message: "Facebook Connection Error",
         severity: "danger",
         status: "active"
       },
       {
-        device_id: deviceIds[5], // Facebook
-        monitor_id: tcpFacebookMonitor[0].id,
+        deviceId: deviceIds[5], // Facebook
+        monitorId: tcpFacebookMonitor[0].id,
         message: "Facebook SSL Certificate Issue",
         severity: "warning",
         status: "active"
       },
       {
-        device_id: deviceIds[7], // Netflix CDN
-        monitor_id: deviceIds[7] + 1, // Assuming the monitor ID follows device ID pattern
+        deviceId: deviceIds[7], // Netflix CDN
+        monitorId: deviceIds[7] + 1, // Assuming the monitor ID follows device ID pattern
         message: "Netflix CDN Response Time Issue",
         severity: "warning",
         status: "active"
