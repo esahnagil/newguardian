@@ -21,7 +21,7 @@ export class HTTPService {
     if (useRealRequest) {
       try {
         const { url, method, headers, body, timeout } = config;
-        const validateSSL = config.validate_ssl;
+        const validateSSL = config.validateSsl;
         
         // Setup request options
         const options = {

@@ -87,7 +87,7 @@ export class MonitorService {
    */
   private async checkMonitor(monitor: Monitor) {
     try {
-      const device = await this.storage.getDevice(monitor.device_id);
+      const device = await this.storage.getDevice(monitor.deviceId);
       
       if (!device) {
         console.error(`Device not found for monitor ${monitor.id}`);
@@ -105,14 +105,14 @@ export class MonitorService {
           status = icmpResult.status;
           responseTime = icmpResult.responseTime;
           details = icmpResult.details;
-          console.log(`[Monitor] ICMP check for ${device.name} (${device.ip_address}): ${status}, response time: ${responseTime}ms`);
+          console.log(`[Monitor] ICMP check for ${device.name} (${device.ipAddress}): ${status}, response time: ${responseTime}ms`);
           break;
         
         case 'snmp':
           const snmpResult = await this.checkSNMP(device, monitor.config as SNMPConfig);
           status = snmpResult.status;
           details = snmpResult.details;
-          console.log(`[Monitor] SNMP check for ${device.name} (${device.ip_address}): ${status}`);
+          console.log(`[Monitor] SNMP check for ${device.name} (${device.ipAddress}): ${status}`);
           break;
         
         case 'http':
@@ -158,8 +158,8 @@ export class MonitorService {
         console.log(`[Monitor] Creating alert for ${device.name}: ${message} (${severity})`);
         
         const alert = await this.storage.createAlert({
-          device_id: device.id,
-          monitor_id: monitor.id,
+          deviceId: device.id,
+          monitorId: monitor.id,
           message,
           severity,
           status: 'active'
@@ -174,14 +174,14 @@ export class MonitorService {
         id: device.id,
         name: device.name,
         status: status,
-        last_check: new Date().toISOString(),
-        response_time: responseTime
+        lastCheck: new Date().toISOString(),
+        responseTime: responseTime
       });
       
       // Notify listeners about the updated monitor result
       this.notifyListeners('monitorResult', {
-        monitor_id: monitor.id,
-        device_id: device.id,
+        monitorId: monitor.id,
+        deviceId: device.id,
         result
       });
       
@@ -199,7 +199,7 @@ export class MonitorService {
     details?: any;
   }> {
     try {
-      const result = await ICMPService.ping(device.ip_address, config);
+      const result = await ICMPService.ping(device.ipAddress, config);
       
       if (!result.success) {
         return {
@@ -239,7 +239,7 @@ export class MonitorService {
     details?: any;
   }> {
     try {
-      const result = await SNMPService.get(device.ip_address, config);
+      const result = await SNMPService.get(device.ipAddress, config);
       
       if (!result.success) {
         return {
@@ -301,7 +301,7 @@ export class MonitorService {
           status: 'down',
           responseTime: result.responseTime,
           details: { 
-            error: result.error || `HTTP status ${result.statusCode} does not match expected ${config.expected_status || 200}`,
+            error: result.error || `HTTP status ${result.statusCode} does not match expected ${config.expectedStatus || 200}`,
             statusCode: result.statusCode
           }
         };
@@ -346,7 +346,7 @@ export class MonitorService {
     details?: any;
   }> {
     try {
-      const result = await TCPService.checkPort(device.ip_address, config);
+      const result = await TCPService.checkPort(device.ipAddress, config);
       
       if (!result.success) {
         return {
