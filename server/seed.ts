@@ -14,7 +14,7 @@ async function shouldSeedDatabase() {
     // İlk olarak tabloların varlığını kontrol et
     const tablesQuery = `
       SELECT COUNT(*) as count FROM information_schema.tables 
-      WHERE table_name IN ('devices', 'monitors', 'monitor_results', 'alerts')
+      WHERE table_name IN ('devices', 'monitors', 'monitorResults', 'alerts')
       AND table_schema = 'public';
     `;
     
@@ -89,18 +89,18 @@ export async function seedDatabase() {
 
     // Add sample devices with real world IPs
     const sampleDevices: InsertDevice[] = [
-      { name: "Google DNS", ip_address: "8.8.8.8", type: "server" },
-      { name: "Cloudflare DNS", ip_address: "1.1.1.1", type: "server" },
-      { name: "Quad9 DNS", ip_address: "9.9.9.9", type: "server" },
-      { name: "OpenDNS", ip_address: "208.67.222.222", type: "server" },
-      { name: "Amazon AWS", ip_address: "52.94.236.248", type: "server" },
-      { name: "Microsoft Azure", ip_address: "20.36.32.15", type: "server" },
-      { name: "Google Cloud", ip_address: "35.190.27.215", type: "server" },
-      { name: "Cloudflare", ip_address: "104.16.132.229", type: "server" },
-      { name: "GitHub", ip_address: "140.82.121.4", type: "server" },
-      { name: "YouTube", ip_address: "142.250.185.78", type: "server" },
-      { name: "Facebook", ip_address: "157.240.3.35", type: "server" },
-      { name: "Twitter", ip_address: "104.244.42.65", type: "server" }
+      { name: "Google DNS", ipAddress: "8.8.8.8", type: "server" },
+      { name: "Cloudflare DNS", ipAddress: "1.1.1.1", type: "server" },
+      { name: "Quad9 DNS", ipAddress: "9.9.9.9", type: "server" },
+      { name: "OpenDNS", ipAddress: "208.67.222.222", type: "server" },
+      { name: "Amazon AWS", ipAddress: "52.94.236.248", type: "server" },
+      { name: "Microsoft Azure", ipAddress: "20.36.32.15", type: "server" },
+      { name: "Google Cloud", ipAddress: "35.190.27.215", type: "server" },
+      { name: "Cloudflare", ipAddress: "104.16.132.229", type: "server" },
+      { name: "GitHub", ipAddress: "140.82.121.4", type: "server" },
+      { name: "YouTube", ipAddress: "142.250.185.78", type: "server" },
+      { name: "Facebook", ipAddress: "157.240.3.35", type: "server" },
+      { name: "Twitter", ipAddress: "104.244.42.65", type: "server" }
     ];
 
     // Insert devices and get their IDs
@@ -112,8 +112,8 @@ export async function seedDatabase() {
           .insert(devices)
           .values({
             ...device,
-            created_at: new Date(),
-            updated_at: new Date()
+            createdAt: new Date(),
+            updatedAt: new Date()
           })
           .returning();
 
@@ -127,9 +127,9 @@ export async function seedDatabase() {
     for (const deviceId of deviceIds) {
       try {
         const monitor: InsertMonitor = {
-          device_id: deviceId,
+          deviceId: deviceId,
           type: "icmp",
-          config: { timeout: 5, packet_size: 56, count: 3 },
+          config: { timeout: 5, packetSize: 56, count: 3 },
           enabled: true,
           interval: 60
         };
@@ -138,8 +138,8 @@ export async function seedDatabase() {
           .insert(monitors)
           .values({
             ...monitor,
-            created_at: new Date(),
-            updated_at: new Date()
+            createdAt: new Date(),
+            updatedAt: new Date()
           })
           .returning();
 
@@ -147,11 +147,11 @@ export async function seedDatabase() {
         await db
           .insert(monitorResults)
           .values({
-            monitor_id: result.id,
+            monitorId: result.id,
             status: deviceId === 3 ? "down" : deviceId === 5 ? "warning" : "online",
-            response_time: deviceId === 5 ? 120 : deviceId === 3 ? null : Math.floor(Math.random() * 20) + 10,
+            responseTime: deviceId === 5 ? 120 : deviceId === 3 ? null : Math.floor(Math.random() * 20) + 10,
             details: deviceId === 3 ? { error: "Connection refused" } : 
-                    deviceId === 5 ? { warning: "High latency" } : null,
+                   deviceId === 5 ? { warning: "High latency" } : null,
             timestamp: new Date()
           });
       } catch (error) {
@@ -163,14 +163,14 @@ export async function seedDatabase() {
     try {
       // Google HTTP monitor
       const httpGoogleMonitor: InsertMonitor = {
-        device_id: deviceIds[0], // Google DNS (ilk cihaz)
+        deviceId: deviceIds[0], // Google DNS (ilk cihaz)
         type: "http",
         config: { 
           url: "https://www.google.com", 
           method: "GET", 
-          expected_status: 200, 
+          expectedStatus: 200, 
           timeout: 5,
-          validate_ssl: true
+          validateSsl: true
         },
         enabled: true,
         interval: 60
@@ -180,21 +180,21 @@ export async function seedDatabase() {
         .insert(monitors)
         .values({
           ...httpGoogleMonitor,
-          created_at: new Date(),
-          updated_at: new Date()
+          createdAt: new Date(),
+          updatedAt: new Date()
         })
         .returning();
         
       // Cloudflare HTTP monitor
       const httpCloudflareMonitor: InsertMonitor = {
-        device_id: deviceIds[1], // Cloudflare DNS (ikinci cihaz)
+        deviceId: deviceIds[1], // Cloudflare DNS (ikinci cihaz)
         type: "http",
         config: { 
           url: "https://www.cloudflare.com", 
           method: "GET", 
-          expected_status: 200, 
+          expectedStatus: 200, 
           timeout: 5,
-          validate_ssl: true
+          validateSsl: true
         },
         enabled: true,
         interval: 60
@@ -204,14 +204,14 @@ export async function seedDatabase() {
         .insert(monitors)
         .values({
           ...httpCloudflareMonitor,
-          created_at: new Date(),
-          updated_at: new Date()
+          createdAt: new Date(),
+          updatedAt: new Date()
         })
         .returning();
 
       // Add TCP monitors for major services
       const tcpGoogleMonitor: InsertMonitor = {
-        device_id: deviceIds[0], // Google DNS (ilk cihaz)
+        deviceId: deviceIds[0], // Google DNS (ilk cihaz)
         type: "tcp",
         config: { port: 53, timeout: 5 },
         enabled: true,
@@ -222,14 +222,14 @@ export async function seedDatabase() {
         .insert(monitors)
         .values({
           ...tcpGoogleMonitor,
-          created_at: new Date(),
-          updated_at: new Date()
+          createdAt: new Date(),
+          updatedAt: new Date()
         })
         .returning();
         
       // GitHub SSH TCP monitor
       const tcpGitHubMonitor: InsertMonitor = {
-        device_id: deviceIds.length >= 9 ? deviceIds[8] : deviceIds[0], // GitHub veya Google DNS
+        deviceId: deviceIds.length >= 9 ? deviceIds[8] : deviceIds[0], // GitHub veya Google DNS
         type: "tcp",
         config: { port: 22, timeout: 5 },
         enabled: true,
@@ -240,44 +240,44 @@ export async function seedDatabase() {
         .insert(monitors)
         .values({
           ...tcpGitHubMonitor,
-          created_at: new Date(),
-          updated_at: new Date()
+          createdAt: new Date(),
+          updatedAt: new Date()
         })
         .returning();
 
       // Add some alerts
       const alertData: InsertAlert[] = [
         {
-          device_id: deviceIds[0], // Google DNS
-          monitor_id: httpGoogleResult.id,
+          deviceId: deviceIds[0], // Google DNS
+          monitorId: httpGoogleResult.id,
           message: "Google Service Offline",
           severity: "danger",
           status: "active"
         },
         {
-          device_id: deviceIds[1], // Cloudflare DNS
-          monitor_id: httpCloudflareResult.id,
+          deviceId: deviceIds[1], // Cloudflare DNS
+          monitorId: httpCloudflareResult.id,
           message: "Cloudflare Connection Issue",
           severity: "warning",
           status: "active"
         },
         {
-          device_id: deviceIds[0], // Google DNS
-          monitor_id: tcpGoogleResult.id,
+          deviceId: deviceIds[0], // Google DNS
+          monitorId: tcpGoogleResult.id,
           message: "Google DNS Error",
           severity: "danger",
           status: "active"
         },
         {
-          device_id: deviceIds.length >= 9 ? deviceIds[8] : deviceIds[0], // GitHub veya Google DNS
-          monitor_id: tcpGitHubResult.id,
+          deviceId: deviceIds.length >= 9 ? deviceIds[8] : deviceIds[0], // GitHub veya Google DNS
+          monitorId: tcpGitHubResult.id,
           message: "GitHub SSH Connection Error",
           severity: "warning",
           status: "active"
         },
         {
-          device_id: deviceIds[2], // Quad9 DNS
-          monitor_id: deviceIds.length >= 3 ? deviceIds[2] : deviceIds[0], // İlgili cihazın monitör ID'si
+          deviceId: deviceIds[2], // Quad9 DNS
+          monitorId: deviceIds.length >= 3 ? deviceIds[2] : deviceIds[0], // İlgili cihazın monitör ID'si
           message: "Quad9 DNS Response Delay",
           severity: "warning",
           status: "active"
