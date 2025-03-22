@@ -6,6 +6,13 @@ import type { InsertDevice, InsertMonitor, InsertAlert } from "../shared/schema"
 import { storage, MemStorage } from "./storage";
 import { PostgresJsDatabase } from "drizzle-orm/postgres-js";
 
+// Bu dosya iki amaçla kullanılabilir:
+// 1. Uygulama başlatıldığında otomatik olarak çalışır ve boş veritabanını doldurur
+// 2. SEED_FORCE=true ortam değişkeni ile manual olarak çalıştırılabilir (npm run db:seed)
+
+// ESM için doğrudan çalıştırma desteği
+// Not: Bu dosya scripts/utils/db-seed.js üzerinden çalıştırılabilir
+
 /**
  * Check if tables exist and if any data exists in the devices table
  */
@@ -76,10 +83,16 @@ export async function seedDatabase() {
 
   try {
     // Check if we need to seed the database
-    const shouldSeed = await shouldSeedDatabase();
-    if (!shouldSeed) {
-      console.log("Database already has data, skipping seed operation");
-      return;
+    // Eğer SEED_FORCE değişkeni true ise, veritabanı içeriğine bakmadan seed işlemi yap
+    const forceSeed = process.env.SEED_FORCE === 'true';
+    if (!forceSeed) {
+      const shouldSeed = await shouldSeedDatabase();
+      if (!shouldSeed) {
+        console.log("Database already has data, skipping seed operation");
+        return;
+      }
+    } else {
+      console.log("Forced seed operation enabled, proceeding with database seed...");
     }
 
     // Veritabanı boş olduğu için seed işlemi yapacağız
