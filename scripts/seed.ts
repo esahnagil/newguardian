@@ -7,12 +7,12 @@ import {
 // Tip tanımlamaları
 interface InsertDevice {
   name: string;
-  ip_address: string;
+  ipAddress: string;
   type: string;
 }
 
 interface InsertMonitor {
-  device_id: number;
+  deviceId: number;
   type: string;
   config: any;
   enabled: boolean;
@@ -20,8 +20,8 @@ interface InsertMonitor {
 }
 
 interface InsertAlert {
-  device_id: number;
-  monitor_id: number;
+  deviceId: number;
+  monitorId: number;
   message: string;
   severity: string;
   status: string;
@@ -41,18 +41,18 @@ async function seedDatabase() {
 
     // Sample devices data - Internet services
     const sampleDevices = [
-      { name: "Google Search", ip_address: "142.250.187.78", type: "server" },
-      { name: "Amazon Web Services", ip_address: "54.239.28.85", type: "server" },
-      { name: "Cloudflare DNS", ip_address: "1.1.1.1", type: "dns" },
-      { name: "Microsoft Azure", ip_address: "20.43.161.1", type: "server" },
-      { name: "Alibaba Cloud", ip_address: "140.205.94.189", type: "server" },
-      { name: "Facebook", ip_address: "157.240.192.35", type: "server" },
-      { name: "Twitter", ip_address: "104.244.42.1", type: "server" },
-      { name: "Netflix CDN", ip_address: "198.38.96.0", type: "cdn" },
-      { name: "Akamai CDN", ip_address: "23.15.146.169", type: "cdn" },
-      { name: "GitHub", ip_address: "140.82.121.4", type: "server" },
-      { name: "Cloudfront CDN", ip_address: "13.224.64.0", type: "cdn" },
-      { name: "Fastly CDN", ip_address: "151.101.1.164", type: "cdn" }
+      { name: "Google Search", ipAddress: "142.250.187.78", type: "server" },
+      { name: "Amazon Web Services", ipAddress: "54.239.28.85", type: "server" },
+      { name: "Cloudflare DNS", ipAddress: "1.1.1.1", type: "dns" },
+      { name: "Microsoft Azure", ipAddress: "20.43.161.1", type: "server" },
+      { name: "Alibaba Cloud", ipAddress: "140.205.94.189", type: "server" },
+      { name: "Facebook", ipAddress: "157.240.192.35", type: "server" },
+      { name: "Twitter", ipAddress: "104.244.42.1", type: "server" },
+      { name: "Netflix CDN", ipAddress: "198.38.96.0", type: "cdn" },
+      { name: "Akamai CDN", ipAddress: "23.15.146.169", type: "cdn" },
+      { name: "GitHub", ipAddress: "140.82.121.4", type: "server" },
+      { name: "Cloudfront CDN", ipAddress: "13.224.64.0", type: "cdn" },
+      { name: "Fastly CDN", ipAddress: "151.101.1.164", type: "cdn" }
     ];
 
     // Insert devices and collect their IDs
@@ -62,10 +62,10 @@ async function seedDatabase() {
       console.log("Trying to insert device:", device);
       const insertObj = {
         name: device.name,
-        ip_address: device.ip_address,
+        ipAddress: device.ipAddress,
         type: device.type,
-        created_at: new Date(),
-        updated_at: new Date()
+        createdAt: new Date(),
+        updatedAt: new Date()
       };
       console.log("Insert object:", insertObj);
       const result = await db.insert(devices).values(insertObj).returning();
@@ -79,22 +79,22 @@ async function seedDatabase() {
       
       // ICMP monitor
       const monitorResult = await db.insert(monitors).values({
-        device_id: deviceId,
+        deviceId: deviceId,
         type: "icmp",
         config: { timeout: 5, packetSize: 56, count: 3 },
         enabled: true,
         interval: 60,
-        created_at: new Date(),
-        updated_at: new Date()
+        createdAt: new Date(),
+        updatedAt: new Date()
       }).returning();
       
       const monitorId = monitorResult[0].id;
       
       // Initial monitor result
       await db.insert(monitorResults).values({
-        monitor_id: monitorId,
+        monitorId: monitorId,
         status: deviceId === 4 ? "down" : deviceId === 5 ? "warning" : "online",
-        response_time: deviceId === 5 ? 120 : deviceId === 4 ? null : Math.floor(Math.random() * 20) + 10,
+        responseTime: deviceId === 5 ? 120 : deviceId === 4 ? null : Math.floor(Math.random() * 20) + 10,
         details: deviceId === 4 ? { error: "Connection refused" } : 
                  deviceId === 5 ? { warning: "High latency" } : null,
         timestamp: new Date()
@@ -105,58 +105,58 @@ async function seedDatabase() {
     
     // Microsoft Azure HTTP monitor
     const httpAzureMonitor = await db.insert(monitors).values({
-      device_id: deviceIds[3], // Microsoft Azure
+      deviceId: deviceIds[3], // Microsoft Azure
       type: "http",
       config: { 
         url: "https://azure.microsoft.com", 
         method: "GET", 
         expectedStatus: 200, 
         timeout: 5,
-        validateSSL: true
+        validateSsl: true
       },
       enabled: true,
       interval: 60,
-      created_at: new Date(),
-      updated_at: new Date()
+      createdAt: new Date(),
+      updatedAt: new Date()
     }).returning();
     
     // Facebook HTTP monitor
     const httpFacebookMonitor = await db.insert(monitors).values({
-      device_id: deviceIds[5], // Facebook
+      deviceId: deviceIds[5], // Facebook
       type: "http",
       config: { 
         url: "https://facebook.com", 
         method: "GET", 
         expectedStatus: 200, 
         timeout: 5,
-        validateSSL: true
+        validateSsl: true
       },
       enabled: true,
       interval: 60,
-      created_at: new Date(),
-      updated_at: new Date()
+      createdAt: new Date(),
+      updatedAt: new Date()
     }).returning();
     
     // Alibaba Cloud TCP monitor
     const tcpAlibabaMonitor = await db.insert(monitors).values({
-      device_id: deviceIds[4], // Alibaba Cloud
+      deviceId: deviceIds[4], // Alibaba Cloud
       type: "tcp",
       config: { port: 443, timeout: 5 },
       enabled: true,
       interval: 60,
-      created_at: new Date(),
-      updated_at: new Date()
+      createdAt: new Date(),
+      updatedAt: new Date()
     }).returning();
     
     // Facebook TCP monitor
     const tcpFacebookMonitor = await db.insert(monitors).values({
-      device_id: deviceIds[5], // Facebook
+      deviceId: deviceIds[5], // Facebook
       type: "tcp",
       config: { port: 443, timeout: 5 },
       enabled: true,
       interval: 60,
-      created_at: new Date(),
-      updated_at: new Date()
+      createdAt: new Date(),
+      updatedAt: new Date()
     }).returning();
 
     // Add some alerts
