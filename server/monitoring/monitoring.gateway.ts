@@ -31,6 +31,6 @@ export class MonitoringGateway implements OnGatewayConnection, OnGatewayDisconne
 
   // Method to broadcast device status updates
   broadcastDeviceStatus(deviceStatus: any) {
-    this.server.emit('device_status', deviceStatus);
+    this.server.emit('deviceStatus', deviceStatus);
   }
 }
